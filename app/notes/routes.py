@@ -4,7 +4,7 @@ import uuid
 from flask_login import current_user
 from .forms import CreateNote
 
-notes_bp = Blueprint('notes', __name__, template_folder='../templates')
+notes_bp = Blueprint('notes', __name__, template_folder='./templates')
 
 @notes_bp.route("/create_note", methods=["GET", "POST"])
 def create_note():
