@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
+
 db = SQLAlchemy()
 
 class User(db.Model, UserMixin):
@@ -9,6 +10,6 @@ class User(db.Model, UserMixin):
 
 class Note(db.Model):
     id = db.Column(db.String(64), primary_key=True, unique=True, nullable=False)
-    # user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    # user = db.relationship('User', backref='notes')
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user = db.relationship('User', backref='notes')
     text = db.Column(db.Text, nullable=False) 

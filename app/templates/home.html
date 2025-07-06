@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Home</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+
+    </head>
+    <body>
+        <header class="bg-gray-100 text-black p-4 border-b">
+             <nav class="container mx-auto flex justify-between items-center">
+                <div class="text-xl font-bold">NoteSharing</div>
+                <ul class="flex space-x-4">
+                {% if current_user.is_authenticated %}
+                    <li class="hover:text-blue-500 transition-colors"><a href="/create_note">Create Note</a></li>
+                    <li class="hover:text-blue-500 transition-colors"><a href="/view_notes">View Notes</a></li>
+                    <li class="hover:text-blue-500 transition-colors"><a href="/logout">Logout</a></li>
+                {% else %}
+                    <li class="hover:text-blue-500 transition-colors"><a href="/login">Login</a></li>
+                    <li class="hover:text-blue-500 transition-colors"><a href="/register">Register</a></li>
+                {% endif %}
+                </ul>
+             </nav>
+        </header>
+
+    </body>
+</html>

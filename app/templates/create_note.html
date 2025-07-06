@@ -2,9 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Document</title>
+    <title>Create Note</title>
 </head>
 <body>
-    <a href="{{url_for('notes.view_note', note_id=note_id)}}">https://example/note/{{note_id}}</a>
+    <div>
+        <form method="post">
+            {{form.hidden_tag()}}
+            {{form.note}}
+            {{form.submit}}
+
+        </form>
+    </div>
 </body>
 </html>
