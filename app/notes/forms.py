@@ -3,5 +3,4 @@ from wtforms import TextAreaField, SubmitField
 
 class CreateNote(FlaskForm):
     note = TextAreaField()
-
     submit = SubmitField("Create note")

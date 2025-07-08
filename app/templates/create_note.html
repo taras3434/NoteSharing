@@ -1,11 +1,32 @@
 {% extends "base.html" %}
+
+{% block head %}
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
+{% endblock %}
+
 {% block content %}
     <div>
-        <form method="post">
+        <form method="post" id="note-form">
             {{form.hidden_tag()}}
-            {{form.note}}
-            {{form.submit}}
+            {{form.note(id="flask-form-note", style="display: none;")}}
+            <div class="max-w-4xl mx-auto my-14">
+                <div id="editor" style="height: 600px;"/>
+            </div>
+            {{form.submit(class="bg-blue-500 text-white px-6 py-3 rounded hover:bg-blue-600 transition-colors")}}
         </form>
     </div>
-{%endblock%}
 
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+
+    <script>
+        const quill = new Quill('#editor', {
+            theme: 'snow'
+        });
+            
+        const form = document.getElementById('note-form');
+        const hiddenField = document.getElementById('flask-form-note');
+        form.addEventListener('submit', function (e) {
+            hiddenField.value = quill.root.innerHTML;
+        });
+    </script>
+{% endblock %}
