@@ -25,7 +25,8 @@ def create_app():
     #TODO flask-migrate
     db.init_app(app)
     login_manager.init_app(app)
-
+    login_manager.login_view = "auth.login"
+    
     @app.route('/favicon.ico')
     def favicon():
         return send_from_directory(os.path.join(app.root_path, 'static'),

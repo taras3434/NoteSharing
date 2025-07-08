@@ -5,8 +5,8 @@ from ..models import User
 
 
 class RegistrationForm(FlaskForm):
-    username = StringField(validators=[InputRequired(), Length(min=4, max=20)])
-    password = PasswordField(validators=[InputRequired(), Length(min=8, max=20)])
+    username = StringField(validators=[InputRequired(), Length(min=1, max=20)])
+    password = PasswordField(validators=[InputRequired(), Length(min=1, max=20)])
 
     submit = SubmitField("Register")
 
@@ -15,8 +15,8 @@ class RegistrationForm(FlaskForm):
             raise ValidationError("Username already exists.")
         
 class LoginForm(FlaskForm):
-    username = StringField(validators=[InputRequired(), Length(min=4, max=20)])
-    password = PasswordField(validators=[InputRequired(), Length(min=8, max=20)])
+    username = StringField(validators=[InputRequired(), Length(min=1, max=20)])
+    password = PasswordField(validators=[InputRequired(), Length(min=1, max=20)])
 
     submit = SubmitField("Login")
         

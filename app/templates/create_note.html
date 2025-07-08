@@ -1,17 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Create Note</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% block content %}
     <div>
         <form method="post">
             {{form.hidden_tag()}}
             {{form.note}}
             {{form.submit}}
-
         </form>
     </div>
-</body>
-</html>
+{%endblock%}
+
