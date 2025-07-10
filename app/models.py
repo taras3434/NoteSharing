@@ -11,11 +11,15 @@ class User(db.Model, UserMixin):
     password_hash = db.Column(db.String(128), nullable=False)
     plan = db.Column(db.String(50), default='free')
 
+    def check_plan(self, note_count):
+        plan = {"free" : 10}
+        return note_count >= plan[self.plan]
+
 class Note(db.Model):
     id = db.Column(db.String(64), primary_key=True, unique=True, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     user = db.relationship('User', backref='notes')
-    #TODO title
+    title = db.Column(db.String(64), nullable=False)
     #TODO start_date
     #TODO last_edit
     text = db.Column(db.Text, nullable=False) 

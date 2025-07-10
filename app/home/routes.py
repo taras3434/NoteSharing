@@ -9,3 +9,7 @@ def main():
 @home_bp.route('/home')
 def home():
     return render_template("home.html")
+
+@home_bp.route("/pricing")
+def pricing():
+    return render_template("pricing.html")

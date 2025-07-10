@@ -8,6 +8,7 @@
     <div>
         <form method="post" id="note-form">
             {{form.hidden_tag()}}
+            {{form.title}}
             {{form.note(id="flask-form-note", style="display: none;")}}
             <div class="max-w-4xl mx-auto my-14">
                 <div id="editor" style="height: 600px;"/>
