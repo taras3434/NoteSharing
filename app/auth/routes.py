@@ -28,11 +28,7 @@ def login():
         user = User.query.filter_by(username=username).first()
         if password == user.password_hash:
             login_user(user)
-            return redirect(url_for("auth.register"))
-        registered_user = User(username=form.username.data, password_hash=form.password.data)
-        db.session.add(registered_user)
-        db.session.commit()
-        return redirect(url_for('home.home'))
+            return redirect(url_for("home.home"))
     return render_template('login.html', form=form)
 
 @auth_bp.route("/logout")
