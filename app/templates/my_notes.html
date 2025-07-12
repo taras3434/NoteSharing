@@ -1,23 +1,44 @@
 {% extends "base.html" %}
 {% block content %}
-    {% if user_notes.count() > 0 %}
+    {% if notes_count > 0 %}
+        <form method="post">
+            {{search_form.hidden_tag()}}
+            {{search_form.search_field}}
+            {{search_form.filter_dropdown}}
+            {{search_form.search}}
+        </form>
+        <form method="get">
+            {{filter_form.hidden_tag()}}
+            {{filter_form.filter_dropdown(onchange="this.form.submit()")}}
+        </form>
         <h1 class="text-2xl text-center font-bold py-10 ">My notes</h1>
-        {%for note in user_notes %}
-        <div class="flex flex-col items-center justify-center">
-                <a href="note/{{note.id}}" class="flex shadow-lg bg-blue-500 rounded-lg p-4 my-4 w-1/2 mx-auto">
-                    <span class="text-white">{{note.id}}</span>
+        {% if search_isActive and notes.count() == 0 %}
+            <h2 class="flex w-1/2 text-xl mx-auto font-semibold text-gray-600">No results found for your search.</h2>
+        {% endif %}
+        {%for note in notes.all() %}
+        <div class="flex flex-col justify-center text-white shadow-md bg-blue-500 rounded-lg w-1/2 mx-auto hover:shadow-lg transition-shadow duration-200">
+            <div class="p-6">
+                <a href="note/{{note.id}}" >
+                    {{note.title}}
                 </a>
+            </div>
+            
+            <div>
+                <p class="flex">File created: {{note.start_date.strftime("%Y-%m-%d %H:%M")}}</p>
+                <p class="flex">Last edit: {{note.last_edit.strftime("%Y-%m-%d %H:%M")}}</p>
                 <form method="post" action="/note/{{note.id}}/delete_note">
                     <button>Delete</button>
-                </form>
+                </form>   
+            </div>     
         </div>
-        {%endfor%}
-    {% else %}
-    <div class="flex flex-col items-center justify-center">
-        <h1 class="text-2xl text-center font-bold py-10 ">You have no notes</h1>
-        <a href="{{ url_for('notes.create_note') }}" class="bg-blue-500 text-white px-6 py-3 rounded hover:bg-blue-600 transition-colors">Create note</a></div>
-    </div>
         
+
+        {%endfor%}
+    {% else %}      
+        <div class="flex flex-col items-center justify-center">
+            <h1 class="text-2xl text-center font-bold py-10 ">You have no notes</h1>
+            <a href="{{ url_for('notes.create_note') }}" class="bg-blue-500 text-white px-6 py-3 rounded hover:bg-blue-600 transition-colors">Create note</a></div>
+        </div>
     {% endif %}
 
 {% endblock %}

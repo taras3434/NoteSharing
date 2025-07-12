@@ -19,4 +19,9 @@ class LoginForm(FlaskForm):
     password = PasswordField(validators=[InputRequired(), Length(min=1, max=20)])
 
     submit = SubmitField("Login")
-        
+
+class ChangePasswordForm(FlaskForm):
+    old_password = StringField(validators=[InputRequired(), Length(min=1, max=20)])
+    new_password = StringField(validators=[InputRequired(), Length(min=1, max=20)])
+
+    submit = SubmitField("Change password")

@@ -5,18 +5,33 @@
 {% endblock %}
 
 {% block content %}
-    <div class="w-1/2 mx-auto rounded-lg shadow-lg text-center">{{note.title}}</div>
-    <div class="max-w-4xl mx-auto my-14">
-        <div id="quill-editor" class="rounded-lg shadow-lg" style="height: 600px;">{{note.text | safe}}</div>
+    <nav class="flex border p-4">    
+        {% if note.user_id == current_user.id %}
+            <button id="title" class="px-4 text-xl font-semibold" onclick="edit_title()">{{note.title}}</button>
+            <form id="title-form" method="post">
+                {{form.hidden_tag()}}
+                {{form.title(id="flask-form-title", style="display: none;", value=note.title, onblur="this.form.submit()")}}
+                {{form.save(id="js-save-title-btn", class="bg-blue-500 text-white px-6 py-3 rounded hover:bg-blue-600 transition-colors", style="display: none;")}}
+            </form>
+        {% else %}
+            <div id="title" class="px-4 text-xl font-semibold" onclick="edit_title()">{{note.title}}</div>
+        {% endif %}
+        <form method="post" action="">
+            <button type="submit">Download</button>
+        </form>
+    </nav>
+    
+    <div class="max-w-4xl mx-auto my-14 border border-15">
+        <div id="quill-editor" style="height: 600px;">{{note.text | safe}}</div>
     </div>
 
     {% if note.user_id == current_user.id %}
-        <button onclick="edit()">Edit note</button>
+        <button id="js-edit-note-btn" onclick="edit_note()">Edit note</button>
         <form id="note-form" method="post">
             {{form.hidden_tag()}}
             {{form.note(id="flask-form-note", style="display: none;")}}
 
-            {{form.submit(id="save-btn", class="bg-blue-500 text-white px-6 py-3 rounded hover:bg-blue-600 transition-colors", style="display: none;")}}
+            {{form.save(id="js-save-note-btn", class="bg-blue-500 text-white px-6 py-3 rounded hover:bg-blue-600 transition-colors", style="display: none;")}}
         </form>
     {% endif %}
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
@@ -26,14 +41,28 @@
         readOnly: true
         });
 
-        function edit() {
+        function edit_note() {
             quill = new Quill('#quill-editor', {
             theme: 'snow',
             readOnly: false
             });
 
-            const saveBtn = document.getElementById('save-btn');
-            saveBtn.style = "display:inline-block;"
+            const edit_note_btn = document.getElementById('js-edit-note-btn')
+            const save_note_button = document.getElementById('js-save-note-btn');
+            
+            save_note_button.style = "display:inline-block;"
+            edit_note_btn.style = "display:none"
+        };
+
+        function edit_title() {
+            const edit_title_btn = document.getElementById("flask-form-title")
+            const title = document.getElementById("title")
+            const save_title_button = document.getElementById('js-save-title-btn');
+
+            edit_title_btn.style = "display:inline-block;"
+            edit_title_btn.focus()
+            
+            title.style = "display:none"
         };
 
         const form = document.getElementById('note-form');
