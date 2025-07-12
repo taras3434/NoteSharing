@@ -1,3 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 .note-item {
     @apply flex flex-col justify-center text-white shadow-md bg-blue-500 rounded-lg w-1/2 mx-auto hover:shadow-lg transition-shadow duration-200;
   }
+
+.nav-item {
+    @apply text-gray-700 hover:text-blue-500 transition-colors duration-200;
+}

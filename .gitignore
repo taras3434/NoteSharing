@@ -90,3 +90,5 @@ dmypy.json
 
 tasks.txt
 instance/notes.db
+
+node_modules/

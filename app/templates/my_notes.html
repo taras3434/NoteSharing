@@ -16,7 +16,7 @@
             <h2 class="flex w-1/2 text-xl mx-auto font-semibold text-gray-600">No results found for your search.</h2>
         {% endif %}
         {%for note in notes.all() %}
-        <div class="flex flex-col justify-center text-white shadow-md bg-blue-500 rounded-lg w-1/2 mx-auto hover:shadow-lg transition-shadow duration-200">
+        <div class="note-item">
             <div class="p-6">
                 <a href="note/{{note.id}}" >
                     {{note.title}}
