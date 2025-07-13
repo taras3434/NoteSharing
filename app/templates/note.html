@@ -20,20 +20,22 @@
             <button type="submit">Download</button>
         </form>
     </nav>
-    
-    <div class="max-w-4xl mx-auto my-14 border border-15">
-        <div id="quill-editor" style="height: 600px;">{{note.text | safe}}</div>
-    </div>
+    <section class="note-section">
+        <div class="max-w-4xl mx-auto my-14 border border-15">
+            <div id="quill-editor" style="height: 600px;">{{note.text | safe}}</div>
+        </div>
 
-    {% if note.user_id == current_user.id %}
-        <button id="js-edit-note-btn" onclick="edit_note()">Edit note</button>
-        <form id="note-form" method="post">
-            {{form.hidden_tag()}}
-            {{form.note(id="flask-form-note", style="display: none;")}}
+        {% if note.user_id == current_user.id %}
+            <button id="js-edit-note-btn" class="submit-btn" onclick="edit_note()">Edit note</button>
+            <form id="note-form" method="post">
+                {{form.hidden_tag()}}
+                {{form.note(id="flask-form-note", style="display: none;")}}
 
-            {{form.save(id="js-save-note-btn", class="bg-blue-500 text-white px-6 py-3 rounded hover:bg-blue-600 transition-colors", style="display: none;")}}
-        </form>
-    {% endif %}
+                {{form.save(id="js-save-note-btn", class="submit-btn", style="display: none;")}}
+            </form>
+        {% endif %}
+    </section>
+        
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
     <script>
         let quill = new Quill('#quill-editor', {

@@ -1,4 +1,31 @@
 {% extends "base.html" %}
 {% block content %}
-    
+    <div class="flex flex-row-reverse justify-center">
+        <section class="pricing-section mr-4">
+            <div class="bg-green-400 w-1/4 rounded-xl text-white font-bold text-center">PRO</div>
+            <h1 class="text-4xl font-bold py-10">9.99$</h1>
+            <ul class="list-disc list-inside space-y-2 text-gray-700">
+                <li>Access to core features</li>
+                <li>Up to 10 notes</li>
+                <li>Text limit 128 symbols</li>
+                <li>free</li>
+            </ul>
+            <div class="mt-8">
+                <button class="submit-btn">Update plan</button>
+            </div>
+        </section>
+        <section class="pricing-section mr-4">
+            <div class="bg-green-400 w-1/4 rounded-xl text-white font-bold text-center">FREE</div>
+            <h1 class="text-4xl font-bold py-10">FREE</h1>
+            <ul class="list-disc list-inside space-y-2 text-gray-700">
+                <li>Access to core features</li>
+                <li>Up to 10 notes</li>
+                <li>Text limit 128 symbols</li>
+                <li>free</li>
+            </ul>
+            <div class="mt-8">
+                <button class="submit-btn">Update plan</button>
+            </div>
+        </section>
+    </div>
 {% endblock %}

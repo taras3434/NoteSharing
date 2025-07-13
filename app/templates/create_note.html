@@ -5,17 +5,22 @@
 {% endblock %}
 
 {% block content %}
-    <div>
+    <section class="w-1/2 mx-auto my-4 p-4 rounded-lg shadow-lg bg-white" style="animation-name: appear; animation-duration: 1s;">
+        <h1 class="text-4xl text-center font-black py-10 ">Create Your Note</h1>
         <form method="post" id="note-form">
             {{form.hidden_tag()}}
-            {{form.title}}
+            <div class="w-1/2 mx-auto">
+                {{form.title(class="input-field ", placeholder=form.title.label.text)}}
+            </div>
             {{form.note(id="flask-form-note", style="display: none;")}}
             <div class="max-w-4xl mx-auto my-14">
                 <div id="editor" style="height: 600px;"/>
             </div>
-            {{form.submit(class="bg-blue-500 text-white px-6 py-3 rounded hover:bg-blue-600 transition-colors")}}
+            <div class="flex justify-center pt-4">
+                {{form.submit(class="submit-btn")}}
+            </div>
         </form>
-    </div>
+    </section>
 
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
 

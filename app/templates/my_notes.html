@@ -3,42 +3,45 @@
     {% if notes_count > 0 %}
         <form method="post">
             {{search_form.hidden_tag()}}
-            {{search_form.search_field}}
-            {{search_form.filter_dropdown}}
-            {{search_form.search}}
-        </form>
-        <form method="get">
-            {{filter_form.hidden_tag()}}
-            {{filter_form.filter_dropdown(onchange="this.form.submit()")}}
-        </form>
-        <h1 class="text-2xl text-center font-bold py-10 ">My notes</h1>
-        {% if search_isActive and notes.count() == 0 %}
-            <h2 class="flex w-1/2 text-xl mx-auto font-semibold text-gray-600">No results found for your search.</h2>
-        {% endif %}
-        {%for note in notes.all() %}
-        <div class="note-item">
-            <div class="p-6">
-                <a href="note/{{note.id}}" >
-                    {{note.title}}
-                </a>
+            <div class="p-4 flex w-full md:w-1/2 mx-auto mt-14 space-x-2 align-middle">
+                {{search_form.search_field(class="input-field", placeholder="Search notes...")}}
+                <button type="submit" class="submit-btn">
+                    Search
+                </button>
             </div>
+                
             
-            <div>
-                <p class="flex">File created: {{note.start_date.strftime("%Y-%m-%d %H:%M")}}</p>
-                <p class="flex">Last edit: {{note.last_edit.strftime("%Y-%m-%d %H:%M")}}</p>
-                <form method="post" action="/note/{{note.id}}/delete_note">
-                    <button>Delete</button>
-                </form>   
-            </div>     
-        </div>
+        </form>
+        <section class="note-section">
+            <h1 class="text-2xl text-center font-bold py-4 ">My notes</h1>
+            <form method="get">
+                {{filter_form.hidden_tag()}}
+                {{filter_form.filter_dropdown(class="mb-10 p-2 rounded-lg float-right", onchange="this.form.submit()")}}
+            </form>
+            {% if search_isActive and notes.count() == 0 %}
+                <h2 class="flex w-1/2 text-xl mx-auto font-semibold text-gray-600">No results found for your search.</h2>
+            {% endif %}
+            {%for note in notes.all() %}
+            <div class="note-item">
+                <a href="note/{{note.id}}" class="flex space-x-4 p-4">
+                    <div>
+                        <p class="font-bold text-xl">{{note.title}}</p>
+                        <p>File created: {{note.start_date.strftime("%Y-%m-%d %H:%M")}}</p>
+                        <p>Last edit: {{note.last_edit.strftime("%Y-%m-%d %H:%M")}}</p>
+                    </div>
+                </a>     
+                <form method="post" action="/note/{{ note.id }}/delete_note">
+                    <button class="text-red-600 hover:underline text-sm">Delete</button>
+                </form>
+            </div>
+            {%endfor%}
+        {% else %}      
+            <div class="flex flex-col items-center justify-center">
+                <h1 class="text-2xl text-center font-bold py-10 ">You have no notes</h1>
+                <a href="{{ url_for('notes.create_note') }}" class="submit-btn">Create note</a></div>
+            </div>
+        {% endif %}
+        </section>
         
-
-        {%endfor%}
-    {% else %}      
-        <div class="flex flex-col items-center justify-center">
-            <h1 class="text-2xl text-center font-bold py-10 ">You have no notes</h1>
-            <a href="{{ url_for('notes.create_note') }}" class="bg-blue-500 text-white px-6 py-3 rounded hover:bg-blue-600 transition-colors">Create note</a></div>
-        </div>
-    {% endif %}
 
 {% endblock %}
