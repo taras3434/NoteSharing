@@ -2,7 +2,7 @@ from flask import Flask, send_from_directory
 from .notes import notes_bp
 from .auth import auth_bp
 from .home import home_bp
-from .models import db, migrate, User
+from .models import db, migrate, User, Note
 from flask_login import LoginManager
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
@@ -14,17 +14,14 @@ login_manager = LoginManager()
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-def create_app():
+def create_app(config_class='config.Config'):
     app = Flask(__name__)
 
     app.register_blueprint(notes_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(home_bp)
 
-    #TODO config.py
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///notes.db'
-    app.config['SECRET_KEY'] = 'your-secret-key'
-    app.config['FLASK_ADMIN_SWATCH'] = 'cerulean'
+    app.config.from_object(config_class)
 
     db.init_app(app)
     migrate.init_app(app, db)
@@ -34,6 +31,7 @@ def create_app():
     
     admin = Admin(app, name='Note Admin', template_mode='bootstrap4')
     admin.add_view(ModelView(User, db.session))
+    admin.add_view(ModelView(Note, db.session))
 
     @app.route('/favicon.ico')
     def favicon():

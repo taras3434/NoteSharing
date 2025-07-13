@@ -40,21 +40,17 @@ def create_note():
 def my_notes():
     search_form = SearchNote()
     filter_form = FilterNote(request.args)
-    
+    notes = Note.query.filter_by(user_id=current_user.id)
     notes_count = Note.query.filter_by(user_id=current_user.id).count()
+    
+    search_isActive = False
 
     if search_form.validate_on_submit():
         notes = Note.query.filter(and_(Note.user_id == current_user.id, 
                                        Note.title.like(f"{search_form.search_field.data.strip()}%")))
+        search_isActive = True
 
-        return render_template("my_notes.html", 
-                               current_user=current_user, 
-                               notes=notes, 
-                               notes_count=notes_count, 
-                               search_form=search_form, 
-                               filter_form=filter_form, 
-                               search_isActive = True)
-    if filter_form.validate():
+    elif filter_form.validate():
         notes = Note.query.filter_by(user_id=current_user.id)
         
         dropdown = {'val1' : notes.order_by(Note.start_date.desc()), 
@@ -62,18 +58,8 @@ def my_notes():
                     'val3' : notes.order_by(Note.title.asc()),
                     'val4' : notes.order_by(Note.title.desc())}
 
-
         notes = dropdown[filter_form.filter_dropdown.data]
-
-        return render_template("my_notes.html", 
-                               current_user=current_user, 
-                               notes=notes, 
-                               notes_count=notes_count, 
-                               search_form=search_form, 
-                               filter_form=filter_form, 
-                               search_isActive = True)
     
-    notes = Note.query.filter_by(user_id=current_user.id)
 
     return render_template("my_notes.html", 
                            current_user=current_user, 
@@ -81,7 +67,7 @@ def my_notes():
                            notes_count=notes_count, 
                            search_form=search_form,
                            filter_form=filter_form, 
-                           search_isActive = False)
+                           search_isActive=search_isActive)
         
 @notes_bp.route("/note/<note_id>", methods=["GET", "POST"])
 def view_note(note_id : str):
