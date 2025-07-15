@@ -2,7 +2,7 @@ from flask import Flask, send_from_directory
 from .notes import notes_bp
 from .auth import auth_bp
 from .home import home_bp
-from .models import db, migrate, User, Note, NoteVersion
+from .models import db, migrate, User, Note, NoteVersion, Tag, note_tag
 from flask_login import LoginManager
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
@@ -33,6 +33,7 @@ def create_app(config_class='config.Config'):
     admin.add_view(ModelView(User, db.session))
     admin.add_view(ModelView(Note, db.session))
     admin.add_view(ModelView(NoteVersion, db.session))
+    admin.add_view(ModelView(Tag, db.session))
 
     @app.route('/favicon.ico')
     def favicon():

@@ -1,5 +1,5 @@
-from flask import Blueprint, render_template, abort, redirect, url_for, request, send_from_directory
-from app.models import db, Note, NoteVersion
+from flask import Blueprint, render_template, abort, redirect, url_for, request, jsonify
+from app.models import db, Note, NoteVersion, Tag, User
 import uuid
 from flask_login import current_user, login_required
 from .forms import CreateNote, EditNote, SearchNote, FilterNote
@@ -12,7 +12,14 @@ notes_bp = Blueprint('notes', __name__)
 @login_required
 def create_note():
     form = CreateNote()
+    user_tags = Tag.query.filter_by(user_id=current_user.id)
+
     if form.validate_on_submit():
+        selected_ids = request.form.get("selected_tags", "")
+        tag_ids = [int(i) for i in selected_ids.split(",") if i.isdigit()]
+
+        tags = Tag.query.filter(Tag.id.in_(tag_ids)).all()
+        
         user_notes = Note.query.filter_by(user_id=current_user.id)
 
         note_title = form.title.data
@@ -26,14 +33,35 @@ def create_note():
                         title=note_title, 
                         text=note_text, 
                         user_id=current_user.id,
+                        tags=tags,
                         start_date=datetime.now(timezone.utc),
                         last_edit=datetime.now(timezone.utc))
         
         db.session.add(new_note)
         db.session.commit()
 
-        return redirect(url_for("notes.view_note", note_id=note_id))
-    return render_template("create_note.html", form=form)
+        return redirect(url_for("notes.view_note", note_id=note_id, user_tags=user_tags))
+    return render_template("create_note.html", form=form, user_tags=user_tags)
+
+
+@notes_bp.route('/add-tag', methods=['POST'])
+@login_required
+def add_tag():
+    data = request.get_json()
+    tag_name = data.get('name', '').strip()
+
+    if not tag_name:
+        return jsonify({'error': 'Empty tag'}), 400
+
+    existing_tag = Tag.query.filter_by(name=tag_name, user_id=current_user.id).first()
+    if existing_tag:
+        return jsonify({'error': 'Tag already exists'}), 400
+
+    new_tag = Tag(name=tag_name, user_id=current_user.id)
+    db.session.add(new_tag)
+    db.session.commit()
+
+    return jsonify({'message': 'Tag added', 'tag': {'id': new_tag.id, 'name': new_tag.name}})
 
 @notes_bp.route("/my-notes", methods=["GET", "POST"])
 @login_required
@@ -42,7 +70,8 @@ def my_notes():
     filter_form = FilterNote(request.args)
     notes = Note.query.filter_by(user_id=current_user.id)
     notes_count = Note.query.filter_by(user_id=current_user.id).count()
-    
+    user_tags = Tag.query.filter_by(user_id=current_user.id)
+
     search_isActive = False
 
     if search_form.validate_on_submit():
@@ -64,7 +93,8 @@ def my_notes():
     return render_template("my_notes.html", 
                            current_user=current_user, 
                            notes=notes, 
-                           notes_count=notes_count, 
+                           notes_count=notes_count,
+                           user_tags=user_tags,
                            search_form=search_form,
                            filter_form=filter_form, 
                            search_isActive=search_isActive)
@@ -99,6 +129,12 @@ def view_note(note_id : str):
 
             if current_user.check_plan(form.note.data):
                 return redirect(url_for("home.pricing"))
+        elif form.new_editor.data:
+            note = Note.query.get(note_id)
+            user = User.query.filter_by(username=form.new_editor.data).first()
+
+            note.editors.append(user)
+            db.session.commit()
         elif form.title.data:
             note.title = form.title.data
             note.last_edit = datetime.now(timezone.utc)

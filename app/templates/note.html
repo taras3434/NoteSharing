@@ -11,14 +11,12 @@
             <form id="title-form" method="post">
                 {{form.hidden_tag()}}
                 {{form.title(id="flask-form-title", style="display: none;", value=note.title, onblur="this.form.submit()")}}
+                {{form.new_editor}}
                 {{form.save(id="js-save-title-btn", class="bg-blue-500 text-white px-6 py-3 rounded hover:bg-blue-600 transition-colors", style="display: none;")}}
             </form>
         {% else %}
             <div id="title" class="px-4 text-xl font-semibold" onclick="edit_title()">{{note.title}}</div>
         {% endif %}
-        <form method="post" action="/note/{{note.id}}/generate_edit_link">
-            <button type="submit">Generate edit link</button>
-        </form>
     </nav>
     <aside class="note-history">
         {% for version in note_versions %}
@@ -30,12 +28,13 @@
             <div id="quill-editor" style="height: 600px;">{{note.text | safe}}</div>
         </div>
 
-        {% if note.user_id == current_user.id %}
+        {% if note.user_id == current_user.id or current_user in note.editors %}
             <button id="js-edit-note-btn" class="submit-btn" onclick="edit_note()">Edit note</button>
             <form id="note-form" method="post">
                 {{form.hidden_tag()}}
                 {{form.note(id="flask-form-note", style="display: none;")}}
-
+                
+                {{form.new_editor}}
                 {{form.save(id="js-save-note-btn", class="submit-btn", style="display: none;")}}
             </form>
         {% endif %}

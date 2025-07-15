@@ -7,16 +7,29 @@
 {% block content %}
     <section class="w-1/2 mx-auto my-4 p-4 rounded-lg shadow-lg bg-white" style="animation-name: appear; animation-duration: 1s;">
         <h1 class="text-4xl text-center font-black py-10 ">Create Your Note</h1>
+
         <form method="post" id="note-form">
             {{form.hidden_tag()}}
             <div class="w-1/2 mx-auto">
                 {{form.title(class="input-field ", placeholder=form.title.label.text)}}
             </div>
+            <div class="flex flex-wrap items-center gap-3 w-1/2 mx-auto text-white mt-4">
+                <div id="tag-list" class="flex flex-wrap gap-3">
+                    {% for tag in user_tags.all() %}
+                        <span class="inline-flex items-center justify-center bg-green-500 px-3 rounded-xl max-w-[150px] h-8 truncate" onclick="makeClickable(this)" data-id="{{ tag.id }}">{{tag.name}}</span>
+                    {% endfor %}
+                    <span class="my-4 text-green-400">
+                        <input id="tag-input" type="text" placeholder="Add tag" class="border rounded px-2 py-1" style="display: none;"/>
+                        <button id="js-add-tag-btn" type="button" onclick="addTag(this)" class="rounded-lg">Add new tag</button>
+                    </span>
+                </div>
+            </div>
             {{form.note(id="flask-form-note", style="display: none;")}}
-            <div class="max-w-4xl mx-auto my-14">
-                <div id="editor" style="height: 600px;"/>
+            <div class="max-w-2xl mx-auto my-14">
+                <div id="editor" style="height: 300px;"/>
             </div>
             <div class="flex justify-center pt-4">
+                {{ form.selected_tags(id="selected-tags") }}
                 {{form.submit(class="submit-btn")}}
             </div>
         </form>
@@ -31,8 +44,77 @@
             
         const form = document.getElementById('note-form');
         const hiddenField = document.getElementById('flask-form-note');
+        const tagList = document.getElementById("tag-list");
+
         form.addEventListener('submit', function (e) {
             hiddenField.value = quill.root.innerHTML;
+
+            const selected = document.querySelectorAll(".selected-tag");
+            const ids = Array.from(selected).map(tag => tag.dataset.id);
+            const hiddenTagsInput = document.getElementById("selected-tags");
+            hiddenTagsInput.value = ids.join(",");
         });
+
+
+        var input = document.getElementById("tag-input");
+        function makeClickable(tag) {
+            tag.classList.toggle("bg-green-700");
+            tag.classList.toggle("bg-green-500");
+            tag.classList.toggle("selected-tag");
+        };
+
+        function createTagElement(name) {
+            const tag = document.createElement("span");
+            tag.className = "inline-flex items-center justify-center bg-green-500 px-3 rounded-xl max-w-[150px] h-8 truncate";
+            tag.textContent = name;
+
+
+            return tag;
+        }
+
+        input.addEventListener("keypress", async function(event) {
+            if (event.key === "Enter") {
+                const name = input.value.trim();
+                
+                event.preventDefault();
+                document.getElementById("js-add-tag-btn").style.display = "inline-block";
+                input.value = "";
+
+                saveTag(name)
+                input.style.display = "none"
+                button.style.display = "inline-block";
+            }
+        });
+
+        async function addTag(button) {            
+            input.style.display = "inline-block"
+            button.style.display = "none";
+            input.focus();
+        }
+
+        async function saveTag(name) {
+            try {
+                const response = await fetch("/add-tag", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name })
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    const tagList = document.getElementById("tag-list");
+                    const tagItem = createTagElement(name);
+                    const addTagBtn = document.getElementById("js-add-tag-btn");
+                    
+                    tagList.insertBefore(tagItem, addTagBtn.parentNode);
+                } else {
+                    console.warn(result.error || result.message);
+                }
+            } catch (error) {
+                console.error("Request failed:", error);
+            }
+        };
+
+ 
     </script>
 {% endblock %}

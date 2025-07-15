@@ -8,8 +8,13 @@
                 <button type="submit" class="submit-btn">
                     Search
                 </button>
+
             </div>
-                
+            <div id="tag-list" class="flex flex-wrap gap-3 text-white w-1/2 mx-auto my-4">
+                {% for tag in user_tags.all() %}
+                    <span class="inline-flex items-center justify-center bg-green-500 px-3 rounded-xl max-w-[150px] h-8 truncate" onclick="makeClickable(this)" data-id="{{ tag.id }}">{{tag.name}}</span>
+                {% endfor %}
+            </div>
             
         </form>
         <section class="note-section">
@@ -31,7 +36,9 @@
                         <p>Last edit: {{note.last_edit.strftime("%Y-%m-%d %H:%M")}}</p>
                     </div>
                     <div class="w-1/4">
-                        <span class="font-semibold">tags, tags, tags,</span>
+                        {% for tag in note.tags %}
+                            <span class="inline-flex items-center justify-center bg-green-500 px-3 rounded-xl max-w-[150px] h-8 truncate text-white">{{tag.name}}</span>
+                        {% endfor %}
                     </div>
                     <input type="checkbox" data-id="{{ note.id }}" {% if note.is_favorite %}checked{% endif %} onchange="updateTaskStatus(this)">
                     <form class="w-1/4 my-auto" method="post" action="/note/{{ note.id }}/delete_note">
@@ -50,6 +57,11 @@
         {% endif %}
         </section>
         <script>
+            function makeClickable(tag) {
+                tag.classList.toggle("bg-green-700");
+                tag.classList.toggle("bg-green-500");
+                tag.classList.toggle("selected-tag");
+            };
             function updateTaskStatus(checkbox) {
                 const taskId = checkbox.dataset.id;
                 const isDone = checkbox.checked;
