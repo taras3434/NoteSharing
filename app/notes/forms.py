@@ -18,5 +18,5 @@ class SearchNote(FlaskForm):
     search = SubmitField("Search note")
 
 class FilterNote(FlaskForm):
-    choices = [('val1', 'Newest'), ('val2', 'Oldest'), ('val3', 'Alphabetical A-Z'), ('val4', 'Alphabetical Z-A')]
+    choices = [('val1', 'Newest'), ('val2', 'Oldest'), ('val3', 'Alphabetical A-Z'), ('val4', 'Alphabetical Z-A'), ('val5', 'Favorite')]
     filter_dropdown = SelectField('filter', choices=choices)

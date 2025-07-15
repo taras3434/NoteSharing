@@ -22,7 +22,7 @@
             {% elif search_isActive and notes.count() == 0 %}
                 <h2 class="flex justify-center mt-4 text-xl font-semibold text-gray-600">No results found for your search.</h2>
             {% endif %}
-            {%for note in notes.all() %}
+            {% for note in notes.all() %}
             <div class="note-item">
                 <a href="note/{{note.id}}" class="flex space-x-4 p-4">
                     <div class="w-1/2">
@@ -33,6 +33,7 @@
                     <div class="w-1/4">
                         <span class="font-semibold">tags, tags, tags,</span>
                     </div>
+                    <input type="checkbox" data-id="{{ note.id }}" {% if note.is_favorite %}checked{% endif %} onchange="updateTaskStatus(this)">
                     <form class="w-1/4 my-auto" method="post" action="/note/{{ note.id }}/delete_note">
                         <button class="text-red-600 float-right hover:underline text-sm my-auto">Delete</button>
                     </form>
@@ -48,6 +49,31 @@
             </div>
         {% endif %}
         </section>
-        
+        <script>
+            function updateTaskStatus(checkbox) {
+                const taskId = checkbox.dataset.id;
+                const isDone = checkbox.checked;
+    
+                fetch('/set-favorite', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        id: taskId,
+                        is_done: isDone
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.success) {
+                        alert("Failed to update task!");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                });
+            }
+        </script>
 
 {% endblock %}

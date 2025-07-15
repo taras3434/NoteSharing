@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, abort, redirect, url_for, request, send_from_directory
-from app.models import db, Note
+from app.models import db, Note, NoteVersion
 import uuid
 from flask_login import current_user, login_required
 from .forms import CreateNote, EditNote, SearchNote, FilterNote
@@ -56,11 +56,11 @@ def my_notes():
         dropdown = {'val1' : notes.order_by(Note.start_date.desc()), 
                     'val2' : notes.order_by(Note.start_date.asc()),
                     'val3' : notes.order_by(Note.title.asc()),
-                    'val4' : notes.order_by(Note.title.desc())}
+                    'val4' : notes.order_by(Note.title.desc()),
+                    'val5' : notes.order_by(Note.is_favorite.desc())}
 
         notes = dropdown[filter_form.filter_dropdown.data]
     
-
     return render_template("my_notes.html", 
                            current_user=current_user, 
                            notes=notes, 
@@ -68,15 +68,32 @@ def my_notes():
                            search_form=search_form,
                            filter_form=filter_form, 
                            search_isActive=search_isActive)
-        
+
+@notes_bp.route("/set-favorite", methods=["POST"])
+def set_favorite():
+    data = request.get_json()
+    task_id = data.get('id')
+    is_favorite = data.get('is_done')
+
+    note = Note.query.get(task_id)
+    if note:
+        note.is_favorite = is_favorite
+        db.session.commit()
+
 @notes_bp.route("/note/<note_id>", methods=["GET", "POST"])
 def view_note(note_id : str):
     form = EditNote()
     note = Note.query.get(note_id)
-    
+    note_versions = NoteVersion.query.filter_by(note_id=note_id)
+
     if form.validate_on_submit():
         
         if form.note.data:
+            note_version = NoteVersion(note_id=note.id, 
+                                       text=note.text)
+            
+            db.session.add(note_version)
+
             note.text = form.note.data
             note.last_edit = datetime.now(timezone.utc)
 
@@ -87,16 +104,17 @@ def view_note(note_id : str):
             note.last_edit = datetime.now(timezone.utc)
         
 
-        
         db.session.commit()
         
         return redirect(url_for("notes.view_note", 
-                                note_id=note_id))
+                                note_id=note_id,
+                                note_versions=note_versions))
     
     if note is None:
         abort(404)
     return render_template("note.html", 
-                           note=note, 
+                           note=note,
+                           note_versions=note_versions,
                            current_user=current_user, 
                            form=form)
 

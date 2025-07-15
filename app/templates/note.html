@@ -16,10 +16,15 @@
         {% else %}
             <div id="title" class="px-4 text-xl font-semibold" onclick="edit_title()">{{note.title}}</div>
         {% endif %}
-        <form method="post" action="">
-            <button type="submit">Download</button>
+        <form method="post" action="/note/{{note.id}}/generate_edit_link">
+            <button type="submit">Generate edit link</button>
         </form>
     </nav>
+    <aside class="note-history">
+        {% for version in note_versions %}
+            <div>{{version.text}}</div>
+        {% endfor %}
+    </aside>
     <section class="note-section">
         <div class="max-w-4xl mx-auto my-14 border border-15">
             <div id="quill-editor" style="height: 600px;">{{note.text | safe}}</div>

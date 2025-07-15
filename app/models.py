@@ -28,3 +28,9 @@ class Note(db.Model):
     start_date = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     last_edit = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     text = db.Column(db.Text, nullable=False) 
+    is_favorite = db.Column(db.Boolean, default=False)
+
+class NoteVersion(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    note_id = db.Column(db.Integer, db.ForeignKey('note.id'), nullable=False)
+    text = db.Column(db.Text, nullable=False) 
