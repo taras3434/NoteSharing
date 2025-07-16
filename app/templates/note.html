@@ -1,80 +1,134 @@
 {% extends "base.html" %}
 
 {% block head %}
-    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
 {% endblock %}
 
 {% block content %}
-    <nav class="flex border p-4">    
-        {% if note.user_id == current_user.id %}
-            <button id="title" class="px-4 text-xl font-semibold" onclick="edit_title()">{{note.title}}</button>
-            <form id="title-form" method="post">
-                {{form.hidden_tag()}}
-                {{form.title(id="flask-form-title", style="display: none;", value=note.title, onblur="this.form.submit()")}}
-                {{form.new_editor}}
-                {{form.save(id="js-save-title-btn", class="bg-blue-500 text-white px-6 py-3 rounded hover:bg-blue-600 transition-colors", style="display: none;")}}
-            </form>
-        {% else %}
-            <div id="title" class="px-4 text-xl font-semibold" onclick="edit_title()">{{note.title}}</div>
-        {% endif %}
-    </nav>
-    <aside class="note-history">
-        {% for version in note_versions %}
-            <div>{{version.text}}</div>
-        {% endfor %}
-    </aside>
-    <section class="note-section">
-        <div class="max-w-4xl mx-auto my-14 border border-15">
-            <div id="quill-editor" style="height: 600px;">{{note.text | safe}}</div>
+<nav class="flex items-center border-b border-gray-200 px-6 py-4 bg-white shadow-sm">
+    <div class="w-full max-w-4xl mx-auto flex items-center justify-between flex-wrap gap-4">
+        <div class="flex-grow truncate">
+            {% if note.user_id == current_user.id %}
+                <h1 id="title" class="text-2xl font-bold text-gray-900 truncate cursor-pointer" onclick="edit_title()">
+                    {{ note.title }}
+                </h1>
+                <form id="title-form" method="post" class="flex items-center gap-3 mt-2">
+                    {{ form.hidden_tag() }}
+                    {{ form.title(id="flask-form-title", 
+                                  class="border border-gray-300 rounded px-3 py-1 text-lg flex-grow", 
+                                  style="display: none;", 
+                                  value=note.title, 
+                                  onblur="this.form.submit()") }}
+                    <button id="js-save-title-btn" type="submit"
+                            class="btn-primary"
+                            style="display: none;">
+                        Save
+                    </button>
+                </form>
+            {% else %}
+                <h1 class="text-2xl font-bold text-gray-900 truncate">{{ note.title }}</h1>
+            {% endif %}
         </div>
 
-        {% if note.user_id == current_user.id or current_user in note.editors %}
-            <button id="js-edit-note-btn" class="submit-btn" onclick="edit_note()">Edit note</button>
-            <form id="note-form" method="post">
-                {{form.hidden_tag()}}
-                {{form.note(id="flask-form-note", style="display: none;")}}
-                
-                {{form.new_editor}}
-                {{form.save(id="js-save-note-btn", class="submit-btn", style="display: none;")}}
-            </form>
+        {% if note.user_id == current_user.id %}
+            <div class="flex items-center gap-2">
+                <button id="add-author-btn" class="btn-secondary submit-btn" type="button" onclick="add_author(this)">
+                    Add Author
+                </button>
+                {{ form.new_editor(id="add-editor-input", class="border border-gray-300 rounded px-3 py-1", style="display:none;") }}
+                {% if form.new_editor.errors %}
+                    <span class="text-red-600 text-sm ml-2">{{ form.new_editor.errors[0] }}</span>
+                {% endif %}
+            </div>
         {% endif %}
-    </section>
-        
-    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
-    <script>
-        let quill = new Quill('#quill-editor', {
+    </div>
+</nav>
+
+<aside x-data="{ showVersionSection: false }" class="fixed top-20 right-10 bg-white p-4 rounded-lg shadow-lg w-60 text-center z-50">
+    <button type="button" @click="showVersionSection = !showVersionSection" class="btn-primary w-full mb-3 submit-btn">
+        Versions
+    </button>
+    <div x-show="showVersionSection" class="overflow-y-auto max-h-64 transition">
+        <ul class="divide-y divide-gray-200">
+            {% for version in note_versions %}
+            <li class="py-2 hover:bg-gray-100 rounded">
+                <a href="{{ url_for('notes.view_note', note_id=note.id, version_id=version.id) }}" class="block text-blue-600 hover:underline">
+                    {{ version.version_date.strftime("%Y-%m-%d %H:%M") }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</aside>
+
+<section class="max-w-4xl mx-auto bg-white rounded-xl shadow p-8 my-14">
+    <div id="quill-editor" class="prose max-w-none text-lg text-gray-800 leading-relaxed min-h-[600px]">{{ note.text | safe }}</div>
+
+    {% if note.user_id == current_user.id or current_user in note.editors %}
+        <div class="flex justify-end mt-8 gap-4">
+            <button id="js-edit-note-btn" class="btn-primary submit-btn" onclick="edit_note()">Edit Note</button>
+            <form id="note-form" method="post" class="hidden">
+                {{ form.hidden_tag() }}
+                {{ form.note(id="flask-form-note") }}
+                {{ form.new_editor }}
+                <button id="js-save-note-btn" type="submit" class="btn-primary mt-4">Save Note</button>
+            </form>
+        </div>
+    {% endif %}
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+<script>
+    let quill = new Quill('#quill-editor', {
         theme: 'bubble',
-        readOnly: true
+        readOnly: true,
+        modules: { toolbar: false }
+    });
+
+    function edit_note() {
+        quill = new Quill('#quill-editor', {
+            theme: 'snow',
+            readOnly: false,
+            modules: {
+                toolbar: [
+                    [{ header: [1, 2, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    ['link', 'blockquote', 'code-block', 'image'],
+                    [{ list: 'ordered' }, { list: 'bullet' }],
+                    ['clean']
+                ]
+            }
         });
 
-        function edit_note() {
-            quill = new Quill('#quill-editor', {
-            theme: 'snow',
-            readOnly: false
-            });
+        document.getElementById('js-edit-note-btn').style.display = 'none';
+        document.getElementById('note-form').classList.remove('hidden');
+    }
 
-            const edit_note_btn = document.getElementById('js-edit-note-btn')
-            const save_note_button = document.getElementById('js-save-note-btn');
-            
-            save_note_button.style = "display:inline-block;"
-            edit_note_btn.style = "display:none"
-        };
+    function edit_title() {
+        const editTitleInput = document.getElementById("flask-form-title");
+        const titleBtn = document.getElementById("title");
+        const saveTitleBtn = document.getElementById('js-save-title-btn');
 
-        function edit_title() {
-            const edit_title_btn = document.getElementById("flask-form-title")
-            const title = document.getElementById("title")
-            const save_title_button = document.getElementById('js-save-title-btn');
+        editTitleInput.style.display = "inline-block";
+        editTitleInput.focus();
 
-            edit_title_btn.style = "display:inline-block;"
-            edit_title_btn.focus()
-            
-            title.style = "display:none"
-        };
+        titleBtn.style.display = "none";
+        saveTitleBtn.style.display = "inline-block";
+    }
 
-        const form = document.getElementById('note-form');
-        const hiddenField = document.getElementById('flask-form-note');
-        form.addEventListener('submit', function (e) {
+    function add_author(button) {
+        button.style.display = "none";
+        const addEditorInput = document.getElementById("add-editor-input");
+        addEditorInput.style.display = "inline-block";
+        addEditorInput.focus();
+    }
+
+    const noteForm = document.getElementById('note-form');
+    if (noteForm) {
+        noteForm.addEventListener('submit', function (e) {
+            const hiddenField = document.getElementById('flask-form-note');
             hiddenField.value = quill.root.innerHTML;
         });
-    </script>
+    }
+</script>
 {% endblock %}

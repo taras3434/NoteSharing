@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, abort, redirect, url_for, request,
 from app.models import db, Note, NoteVersion, Tag, User
 import uuid
 from flask_login import current_user, login_required
-from .forms import CreateNote, EditNote, SearchNote, FilterNote
+from .forms import CreateNote, EditNote
 from sqlalchemy import and_
 from datetime import datetime, timezone
 
@@ -66,38 +66,43 @@ def add_tag():
 @notes_bp.route("/my-notes", methods=["GET", "POST"])
 @login_required
 def my_notes():
-    search_form = SearchNote()
-    filter_form = FilterNote(request.args)
     notes = Note.query.filter_by(user_id=current_user.id)
     notes_count = Note.query.filter_by(user_id=current_user.id).count()
     user_tags = Tag.query.filter_by(user_id=current_user.id)
 
+    search_term = request.args.get("search_field", "").strip()
+    selected_tags_str = request.args.get("selected_tags", "")
+    selected_tag_ids = [int(tid) for tid in selected_tags_str.split(',') if tid.isdigit()]
     search_isActive = False
 
-    if search_form.validate_on_submit():
-        notes = Note.query.filter(and_(Note.user_id == current_user.id, 
-                                       Note.title.like(f"{search_form.search_field.data.strip()}%")))
+    # Filter by search query
+    if search_term:
+        notes = notes.filter(Note.title.ilike(f"{search_term}%"))
         search_isActive = True
 
-    elif filter_form.validate():
-        notes = Note.query.filter_by(user_id=current_user.id)
-        
+    # Filter by selected tags
+    if selected_tag_ids:
+        for tag_id in selected_tag_ids:
+            notes = notes.filter(Note.tags.any(Tag.id == tag_id))
+        search_isActive = True
+                
+    selected_filter = request.args.get("filter_dropdown")  
+    if selected_filter:
         dropdown = {'val1' : notes.order_by(Note.start_date.desc()), 
                     'val2' : notes.order_by(Note.start_date.asc()),
                     'val3' : notes.order_by(Note.title.asc()),
                     'val4' : notes.order_by(Note.title.desc()),
                     'val5' : notes.order_by(Note.is_favorite.desc())}
 
-        notes = dropdown[filter_form.filter_dropdown.data]
+        notes = dropdown[selected_filter]
     
     return render_template("my_notes.html", 
                            current_user=current_user, 
                            notes=notes, 
                            notes_count=notes_count,
                            user_tags=user_tags,
-                           search_form=search_form,
-                           filter_form=filter_form, 
-                           search_isActive=search_isActive)
+                           search_isActive=search_isActive,
+                           selected_tag_ids=selected_tag_ids)
 
 @notes_bp.route("/set-favorite", methods=["POST"])
 def set_favorite():
@@ -115,12 +120,19 @@ def view_note(note_id : str):
     form = EditNote()
     note = Note.query.get(note_id)
     note_versions = NoteVersion.query.filter_by(note_id=note_id)
-
+    
+    version_id = request.args.get("version_id", type=int)
+    if version_id:
+        version = NoteVersion.query.get(version_id)
+        if version and version.note_id == note_id:
+            note.text = version.text
+            
     if form.validate_on_submit():
         
         if form.note.data:
             note_version = NoteVersion(note_id=note.id, 
-                                       text=note.text)
+                                       text=note.text,
+                                       version_date=note.last_edit)
             
             db.session.add(note_version)
 
@@ -132,19 +144,21 @@ def view_note(note_id : str):
         elif form.new_editor.data:
             note = Note.query.get(note_id)
             user = User.query.filter_by(username=form.new_editor.data).first()
+            
+            if not user:
+                form.new_editor.errors.append('Username does not exist')
+            elif user in note.editors:
+                form.new_editor.errors.append('Username already editor')
 
-            note.editors.append(user)
-            db.session.commit()
+            else:
+                note.editors.append(user)
+            
         elif form.title.data:
             note.title = form.title.data
             note.last_edit = datetime.now(timezone.utc)
         
 
         db.session.commit()
-        
-        return redirect(url_for("notes.view_note", 
-                                note_id=note_id,
-                                note_versions=note_versions))
     
     if note is None:
         abort(404)

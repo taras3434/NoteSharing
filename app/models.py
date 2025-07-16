@@ -47,7 +47,8 @@ class NoteVersion(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     note_id = db.Column(db.Integer, db.ForeignKey('note.id'), nullable=False)
     text = db.Column(db.Text, nullable=False) 
-
+    version_date = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    
 class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)

@@ -3,10 +3,14 @@
 @tailwind utilities;
 
 .note-item {
-	@apply flex flex-col justify-center mt-4 border w-full hover:shadow-lg transition-shadow duration-200;
+	@apply flex flex-col justify-center mt-4 border w-full hover:shadow-lg transition-shadow duration-200 rounded-lg;
 }
 
-.note-section {
+.tag {
+	@apply inline-flex items-center justify-center border-green-500 border px-3 rounded-full max-w-[150px] h-8 truncate cursor-pointer transition-colors font-semibold text-gray-600
+}
+
+.notes-section {
 	@apply bg-white rounded-lg my-4 w-1/2 mx-auto shadow-lg p-12
 }
 
@@ -19,7 +23,7 @@
 }
 
 .submit-btn {
-	@apply bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 transition-colors cursor-pointer
+	@apply bg-green-500 text-white px-6 py-2 rounded-full hover:bg-green-600 transition-colors cursor-pointer
 }
 
 .reset-btn {
@@ -73,4 +77,34 @@
     to {
         transform: translateY(0);
     }
+}
+
+
+.ql-toolbar.ql-snow {
+	background-color: #111827; /* Tailwind's gray-900 */
+	border: none;
+}
+
+.ql-toolbar.ql-snow .ql-picker,
+.ql-toolbar.ql-snow .ql-stroke {
+	color: white;
+	stroke: white;
+}
+
+.ql-toolbar.ql-snow .ql-fill {
+	fill: white;
+}
+
+.ql-toolbar.ql-snow .ql-picker-options {
+	background-color: #1f2937; /* gray-800 */
+	color: white;
+}
+
+.ql-toolbar.ql-snow .ql-picker-label {
+	color: white;
+}
+
+.ql-toolbar.ql-snow button:hover,
+.ql-toolbar.ql-snow button.ql-active {
+	background-color: #374151; /* gray-700 */
 }

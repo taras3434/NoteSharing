@@ -1,28 +1,52 @@
 {% extends "base.html" %}
 {% block content %}
     {% if notes_count > 0 %}
-        <form method="post">
-            {{search_form.hidden_tag()}}
+        <form id="search_form" method="get">
             <div class="p-4 flex w-full md:w-1/2 mx-auto mt-14 space-x-2 align-middle">
-                {{search_form.search_field(class="input-field", placeholder="Search notes...")}}
+                <input 
+                    id="search-field"
+                    type="text" 
+                    name="search_field" 
+                    class="input-field" 
+                    placeholder="Search notes..." 
+                    value="{{ request.args.get('search_field', '') }}"
+                >
+                <input type="hidden" name="selected_tags" id="selected-tags-field" value="{{ request.args.get('selected_tags', '') }}">
                 <button type="submit" class="submit-btn">
                     Search
                 </button>
 
             </div>
-            <div id="tag-list" class="flex flex-wrap gap-3 text-white w-1/2 mx-auto my-4">
+            <div id="tag-list" class="flex flex-wrap gap-3 w-1/2 mx-auto my-4">
                 {% for tag in user_tags.all() %}
-                    <span class="inline-flex items-center justify-center bg-green-500 px-3 rounded-xl max-w-[150px] h-8 truncate" onclick="makeClickable(this)" data-id="{{ tag.id }}">{{tag.name}}</span>
+                <span 
+                    class="tag
+                    {% if tag.id in selected_tag_ids %}
+                        bg-green-500
+                    {% endif %}" 
+                    onclick="makeClickable(this)" 
+                    data-id="{{ tag.id }}">{{tag.name}}</span>
                 {% endfor %}
+                <a href="{{url_for('notes.my_notes')}}" class="text-black">Clear</a>
+
             </div>
-            
+                
         </form>
-        <section class="note-section">
+        <section class="notes-section">
             {% if notes.count() > 0 %}
                 <h1 class="text-2xl text-center font-bold py-4 ">My notes</h1>
                 <form method="get">
-                    {{filter_form.hidden_tag()}}
-                    {{filter_form.filter_dropdown(class="mb-10 p-2 rounded-lg float-right", onchange="this.form.submit()")}}
+                    <input type="hidden" name="search_field" value="{{ request.args.get('search_field', '') }}">
+                    <input type="hidden" name="selected_tags" value="{{ request.args.get('selected_tags', '') }}">
+                    <select name="filter_dropdown" class="mb-10 p-2 rounded-lg float-right" onchange="this.form.submit()">
+                        <option value="val1" {% if request.args.get('filter_dropdown') == 'val1' %}selected{% endif %}>Newest</option>
+                        <option value="val2" {% if request.args.get('filter_dropdown') == 'val2' %}selected{% endif %}>Oldest</option>
+                        {% if not search_isActive %}
+                            <option value="val3" {% if request.args.get('filter_dropdown') == 'val3' %}selected{% endif %}>Title A-Z</option>
+                            <option value="val4" {% if request.args.get('filter_dropdown') == 'val4' %}selected{% endif %}>Title Z-A</option>
+                        {% endif %}
+                        <option value="val5" {% if request.args.get('filter_dropdown') == 'val5' %}selected{% endif %}>Favorite</option>
+                    </select>
                 </form>
             {% elif search_isActive and notes.count() == 0 %}
                 <h2 class="flex justify-center mt-4 text-xl font-semibold text-gray-600">No results found for your search.</h2>
@@ -35,13 +59,14 @@
                         <p>File created: {{note.start_date.strftime("%Y-%m-%d %H:%M")}}</p>
                         <p>Last edit: {{note.last_edit.strftime("%Y-%m-%d %H:%M")}}</p>
                     </div>
-                    <div class="w-1/4">
+                    <div class="flex flex-wrap gap-2 w-[90%]">
                         {% for tag in note.tags %}
-                            <span class="inline-flex items-center justify-center bg-green-500 px-3 rounded-xl max-w-[150px] h-8 truncate text-white">{{tag.name}}</span>
+                            <span class="tag">{{tag.name}}</span>
                         {% endfor %}
                     </div>
-                    <input type="checkbox" data-id="{{ note.id }}" {% if note.is_favorite %}checked{% endif %} onchange="updateTaskStatus(this)">
-                    <form class="w-1/4 my-auto" method="post" action="/note/{{ note.id }}/delete_note">
+                    <input id="is-favorite-checkbox-{{note.title}}" type="checkbox" data-id="{{ note.id }}" {% if note.is_favorite %}checked{% endif %} onchange="updateTaskStatus(this)">
+                    <label class="cursor-pointer" for="is-favorite-checkbox-{{note.title}}">Mark as favorite</label>
+                    <form class="w-1/4 my-auto" method="post" action="/note/{{ note.id }}/delete_note" onsubmit="return confirm('Are you sure you want to delete this note?');">
                         <button class="text-red-600 float-right hover:underline text-sm my-auto">Delete</button>
                     </form>
                 </a>     
@@ -58,9 +83,13 @@
         </section>
         <script>
             function makeClickable(tag) {
-                tag.classList.toggle("bg-green-700");
                 tag.classList.toggle("bg-green-500");
+                tag.classList.toggle("text-white");
                 tag.classList.toggle("selected-tag");
+                const selected = Array.from(document.querySelectorAll('#tag-list .selected-tag'))
+                .map(el => el.getAttribute('data-id'));
+
+                document.getElementById('selected-tags-field').value = selected.join(',');
             };
             function updateTaskStatus(checkbox) {
                 const taskId = checkbox.dataset.id;
@@ -85,6 +114,23 @@
                 .catch(error => {
                     console.error("Error:", error);
                 });
+            }
+
+            function clear() {
+                const search_form = document.getElementById("search_form");
+                const search_field = document.getElementById("search-field");
+                const selected_tags_field = document.getElementById("selected-tags-field");
+
+                if (search_field) search_field.value = "";
+                if (selected_tags_field) selected_tags_field.value = "";
+
+                // Reset tags visuals
+                document.querySelectorAll('#tag-list span.selected-tag').forEach(tag => {
+                    tag.classList.remove('selected-tag', 'bg-green-700');
+                    tag.classList.add('bg-green-500');
+                });
+
+                search_form.submit();
             }
         </script>
 

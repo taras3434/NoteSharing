@@ -3,16 +3,19 @@
     <section class="bg-white rounded-lg w-1/4 shadow-xl mx-auto my-14">
         <h1 class="text-4xl text-center p-4 font-black">Profile</h1>
         <div class="p-4 space-y-3">
-            <div class="p-4 text-xl border-b font-bold">
-                <span class="font-normal">Username: {{current_user.username}}</span>
+            <div class="p-4 text-xl border-b">
+                <span class="font-semibold">Username</span>
+                <p>{{current_user.username}}</p>
             </div>
-            <div class="p-4 text-xl border-b font-bold">
-                <span class="font-normal">Plan: {{current_user.plan}}</span>
+            <div class="p-4 text-xl border-b">
+                <span class="font-semibold">Plan</span>
+                <p>{{current_user.plan}}</p>
             </div>
-            <div class="p-4 text-xl border-b font-bold">
-                <span class="font-normal">Notes: {{user_notes.count()}}</span>
+            <div class="p-4 text-xl border-b">
+                <span class="font-semibold">Notes</span>
+                <p>{{user_notes.count()}}</p>
             </div>
-            <a class="submit-btn mt-8" href="{{url_for('auth.change_password')}}">Change password</a>
+            <a class="flex submit-btn justify-center" href="{{url_for('auth.change_password')}}">Change password</a>
 
         </div>
 

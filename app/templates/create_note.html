@@ -10,31 +10,32 @@
 
         <form method="post" id="note-form">
             {{form.hidden_tag()}}
-            <div class="w-1/2 mx-auto">
+            <div class="w-3/4 mx-auto">
                 {{form.title(class="input-field ", placeholder=form.title.label.text)}}
             </div>
-            <div class="flex flex-wrap items-center gap-3 w-1/2 mx-auto text-white mt-4">
+            <div class="flex flex-wrap items-center gap-3 w-3/4 mx-auto mt-7">
+                <label class="block text-lg font-semibold mb-2">Tags</label>
                 <div id="tag-list" class="flex flex-wrap gap-3">
                     {% for tag in user_tags.all() %}
-                        <span class="inline-flex items-center justify-center bg-green-500 px-3 rounded-xl max-w-[150px] h-8 truncate" onclick="makeClickable(this)" data-id="{{ tag.id }}">{{tag.name}}</span>
+                        <span class="tag" onclick="makeClickable(this)" data-id="{{ tag.id }}">{{tag.name}}</span>
                     {% endfor %}
-                    <span class="my-4 text-green-400">
+                    <span class="inline-flex text-black">
                         <input id="tag-input" type="text" placeholder="Add tag" class="border rounded px-2 py-1" style="display: none;"/>
                         <button id="js-add-tag-btn" type="button" onclick="addTag(this)" class="rounded-lg">Add new tag</button>
                     </span>
                 </div>
             </div>
             {{form.note(id="flask-form-note", style="display: none;")}}
-            <div class="max-w-2xl mx-auto my-14">
+            <div class="w-3/4 mx-auto my-7">
                 <div id="editor" style="height: 300px;"/>
             </div>
-            <div class="flex justify-center pt-4">
+            <div class="flex items-center justify-end mt-6">
                 {{ form.selected_tags(id="selected-tags") }}
                 {{form.submit(class="submit-btn")}}
             </div>
         </form>
     </section>
-
+    
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
 
     <script>
@@ -58,14 +59,18 @@
 
         var input = document.getElementById("tag-input");
         function makeClickable(tag) {
-            tag.classList.toggle("bg-green-700");
             tag.classList.toggle("bg-green-500");
+            tag.classList.toggle("text-white");
             tag.classList.toggle("selected-tag");
         };
 
-        function createTagElement(name) {
+        function createTagElement(name, id) {
             const tag = document.createElement("span");
             tag.className = "inline-flex items-center justify-center bg-green-500 px-3 rounded-xl max-w-[150px] h-8 truncate";
+            tag.dataset.id = id;
+            tag.addEventListener("click", function () {
+                makeClickable(tag);
+            });
             tag.textContent = name;
 
 
@@ -103,7 +108,7 @@
                 const result = await response.json();
                 if (response.ok) {
                     const tagList = document.getElementById("tag-list");
-                    const tagItem = createTagElement(name);
+                    const tagItem = createTagElement(result.tag.name, result.tag.id);
                     const addTagBtn = document.getElementById("js-add-tag-btn");
                     
                     tagList.insertBefore(tagItem, addTagBtn.parentNode);

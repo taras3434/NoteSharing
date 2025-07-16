@@ -1,24 +1,16 @@
 {% extends "base.html" %}
 {% block content %}
-<section class="auth-section">
+<section class="auth-section" x-data>
     <div>
         <h1 class="text-2xl text-center font-bold py-10 ">{% block title %}{% endblock %}</h1>
-        <form method="post">
+        <form method="post" x-ref="form">
             <div class="space-y-4">
                 {% block form_fields %}
                 {% endblock %}
-                <button class="reset-btn float-right">Clean</button>
+                <button type="button" class="reset-btn float-right" @click="$refs.form.reset()">Clean</button>
             </div>
         </form>
     </div>
     
 </section>
-<script>
-    const resetBtn = document.querySelector('.reset-btn');
-    resetBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        const form = e.target.closest('form');
-        form.reset();
-    });
-</script>
 {% endblock %}
