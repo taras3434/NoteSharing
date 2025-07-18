@@ -4,27 +4,32 @@ from app.models import User, Note, db
 from flask_login import login_user, logout_user, login_required, current_user
 from .utils import hash_password, check_password
 
-auth_bp = Blueprint('auth', __name__, template_folder='./templates')
+auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
+    """
+    Handle user registration
+    """
     form = RegistrationForm()
 
     if form.validate_on_submit():
-        existing_user = User.query.filter_by(username=form.username.data).first()
-        if existing_user:
-            flash('Username already exist', 'error')
-            return redirect(url_for('auth.register'))
+        registered_user = User(username=form.username.data, 
+                               password_hash=hash_password(form.password.data))
         
-        registered_user = User(username=form.username.data, password_hash=hash_password(form.password.data))
         db.session.add(registered_user)
         db.session.commit()
+
         login_user(registered_user)
+
         return redirect(url_for('home.main', success=True))
     return render_template('register.html', form=form)
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
+    """
+    Handle user login
+    """
     form = LoginForm()
 
     if form.validate_on_submit():
@@ -32,14 +37,21 @@ def login():
         password = form.password.data
 
         user = User.query.filter_by(username=username).first()
-        if check_password(user.password_hash, password):
+
+        if user and check_password(user.password_hash, password):
             login_user(user)
             return redirect(url_for("home.home"))
+        else:
+            flash("Invalid username or password.", "error")
+
     return render_template('login.html', form=form)
 
 @auth_bp.route('/profile', methods=['GET'])
 @login_required
 def profile():
+    """
+    User profile render
+    """
     user_notes = Note.query.filter_by(user_id=current_user.id)
     return render_template("profile.html", 
                            current_user=current_user, 
@@ -48,6 +60,9 @@ def profile():
 @auth_bp.route('/change_password', methods=['GET', 'POST'])
 @login_required
 def change_password():
+    """
+    Allow users to change their password.
+    """
     form = ChangePasswordForm()
 
     if form.validate_on_submit():
@@ -55,17 +70,23 @@ def change_password():
         new_password = form.new_password.data
 
         user = User.query.filter_by(username=current_user.username).first()
-        if check_password(user.password_hash, old_password):
+
+        if user and check_password(user.password_hash, old_password):
             user.password_hash = hash_password(new_password)
 
             db.session.commit()
+
             return redirect(url_for("auth.profile"))
-        
+
+
     return render_template('change_password.html', form=form)
 
 
 @auth_bp.route("/logout")
 @login_required
 def logout():
+    """
+    Log the current user out
+    """
     logout_user()
     return redirect(url_for("home.main"))

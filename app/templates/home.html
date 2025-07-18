@@ -1,25 +1,27 @@
 {% extends "base.html" %}
 
-{% block head %}
-    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
-{% endblock %}
-
 {% block content %}
-<section class="bg-white py-20 animate-fade-in">
+<!-- Hero Section -->
+<section 
+    class="bg-white py-20 animate-fade-in">
     <h1 class="text-5xl text-center font-extrabold text-gray-800 mb-4">Share Your Notes</h1>
-    <p class="text-center text-lg text-gray-600 mb-10">Create, collaborate, and share your thoughts instantly</p>
+    <p class="text-center text-lg text-gray-600 mb-10">Click Get Started to create your first note!</p>
+    
     <div class="flex justify-center space-x-6">
         <a href="{{url_for('notes.create_note')}}" class="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-full shadow-md transition-all">Get Started</a>
-        <a href="{{url_for('notes.my_notes')}}" class="bg-white border border-blue-600 text-blue-600 hover:bg-blue-50 font-semibold px-6 py-3 rounded-full shadow-md transition-all">Browse Notes</a>
+        <a href="{{url_for('notes.my_notes')}}" class="bg-white border border-green-600 text-green-600 hover:bg-green-50 font-semibold px-6 py-3 rounded-full shadow-md transition-all">Browse Notes</a>
     </div>
+    
     <div class="w-full max-w-3xl mx-auto mt-14 pointer-events-none select-none rounded-lg border shadow-lg overflow-hidden">
         <div id="editor" style="height: 400px; background-color: white;"></div>
     </div>
 </section>
 
+<!-- Features Section -->
 <section class="bg-gray-50 py-20">
     <div class="container mx-auto">
         <h2 class="text-4xl text-center font-bold text-gray-800 mb-12">Features</h2>
+        
         <div class="flex flex-wrap justify-center gap-10">
             <div class="bg-white rounded-2xl shadow-xl p-8 w-72 text-center">
                 <h3 class="text-xl font-semibold mb-4">Share Instantly</h3>
@@ -37,43 +39,51 @@
     </div>
 </section>
 
-<section class="py-20">
+<!-- How It Works Section -->
+<section class="py-20 bg-white">
     <h2 class="text-4xl text-center font-bold text-gray-800 mb-12">How It Works</h2>
-    <div class="flex flex-wrap justify-center gap-10">
-        <div class="bg-white rounded-2xl shadow-xl p-8 w-72 text-center">
-            <h3 class="text-xl font-semibold mb-4">Quick & Easy</h3>
-            <p>Write notes quickly with a simple rich text editor.</p>
-        </div>
-        <div class="bg-white rounded-2xl shadow-xl p-8 w-72 text-center">
-            <h3 class="text-xl font-semibold mb-4">Unique URLs</h3>
-            <p>Each note gets a private, shareable link instantly.</p>
-        </div>
-        <div class="bg-white rounded-2xl shadow-xl p-8 w-72 text-center">
-            <h3 class="text-xl font-semibold mb-4">No Signup Needed</h3>
-            <p>Anyone can view or edit if they have the link.</p>
-        </div>
-    </div>
-</section>
-
-<section class="bg-gray-50 py-20">
-    <div class="container mx-auto">
-        <h2 class="text-4xl text-center font-bold text-gray-800 mb-12">Frequently Asked Questions</h2>
-        <div class="flex flex-wrap justify-center gap-10">
-            <div class="bg-white rounded-2xl shadow-xl p-8 w-72 text-left">
-                <h4 class="font-semibold mb-2">Is my data secure?</h4>
-                <p>Your notes are private unless shared. We never index them.</p>
+    
+    <div class="w-1/6 mx-auto space-y-8">
+        <div class="flex items-start gap-4">
+            <div class="flex-shrink-0 text-white bg-green-500 rounded-full w-10 h-10 flex items-center justify-center font-bold text-lg">1</div>
+            <div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-1">Quick & Easy</h3>
+                <p class="text-gray-600">Write notes quickly with a simple rich text editor.</p>
             </div>
-            <div class="bg-white rounded-2xl shadow-xl p-8 w-72 text-left">
-                <h4 class="font-semibold mb-2">Can I delete a note?</h4>
-                <p>Yes, creators can delete notes anytime from their dashboard.</p>
+        </div>
+        <div class="flex items-start gap-4">
+            <div class="flex-shrink-0 text-white bg-green-500 rounded-full w-10 h-10 flex items-center justify-center font-bold text-lg">2</div>
+            <div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-1">Unique URLs</h3>
+                <p class="text-gray-600">Each note gets a private, shareable link instantly.</p>
             </div>
-            <div class="bg-white rounded-2xl shadow-xl p-8 w-72 text-left">
-                <h4 class="font-semibold mb-2">Is it free to use?</h4>
-                <p>Yes! All features are completely free to use.</p>
+        </div>
+        <div class="flex items-start gap-4">
+            <div class="flex-shrink-0 text-white bg-green-500 rounded-full w-10 h-10 flex items-center justify-center font-bold text-lg">3</div>
+            <div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-1">No Signup Needed</h3>
+                <p class="text-gray-600">Anyone can view or edit if they have the link.</p>
             </div>
         </div>
     </div>
 </section>
 
-<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+<!-- FAQ Section -->
+<section class="max-w-4xl mx-auto bg-white rounded-xl shadow p-8 my-14">
+    <h2 class="text-2xl font-bold text-gray-900 mb-6">Frequently Asked Questions</h2>
+    
+    <div class="divide-y divide-gray-200">
+        {% for faq in faqs %}
+        <div x-data="{ open: false }" class="py-4">
+            <button @click="open = !open" class="w-full text-left text-lg font-medium hover:underline focus:outline-none">
+                {{ faq.question }}
+            </button>
+            <div x-show="open" x-transition.duration.200ms class="mt-2 text-gray-700 text-base leading-relaxed">
+                {{ faq.answer }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
 {% endblock %}
