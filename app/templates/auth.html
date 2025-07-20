@@ -1,13 +1,16 @@
 {% extends "base.html" %}
 {% block content %}
-<section class="max-w-md mx-auto my-14">
-    <div class="shadow-lg rounded-xl p-6 bg-gray-300">
-        <h1 class="text-2xl text-center font-bold py-10 ">{%block title%}{%endblock%}</h1>
-        <form method="post">
-            {% block form_fields %}
-            {% endblock %}
+<!-- Authentication template section -->
+<section class="auth-section" x-data>
+    <div>
+        <h1 class="auth-title">{% block title %}{% endblock %}</h1>
+        <form method="post" x-ref="form">
+            <div class="space-y-4">
+                {% block form_fields %}
+                {% endblock %}
+                <button type="button" class="reset-btn float-right" @click="$refs.form.reset()">Clean</button>
+            </div>
         </form>
     </div>
-    <a href="/login" class="flex text-center py-4 w-1/2 mx-auto hover:text-blue-500 transition-colors">Already have account? Sign up</a>
 </section>
 {% endblock %}

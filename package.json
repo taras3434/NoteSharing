@@ -1,0 +1,16 @@
+{
+    "scripts": {
+      "build:css": "tailwindcss -i ./styles.css -o ./app/static/css/output.css --watch",
+      "copy:quill": "mkdir -p ./app/static/quill && cp ./node_modules/quill/dist/quill.* ./app/static/quill/",
+      "copy:alpine": "mkdir -p ./app/static/alpine && cp ./node_modules/alpinejs/dist/cdn.min.js ./app/static/alpine/alpine.min.js",
+      "build:all": "npm run copy:quill && npm run copy:alpine && npm run build:css"
+    },
+    "dependencies": {
+      "alpinejs": "^3.14.9",
+      "autoprefixer": "^10.4.21",
+      "postcss": "^8.5.6",
+      "quill": "^2.0.3",
+      "tailwindcss": "^3.4.17"
+    }
+  }
+  

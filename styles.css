@@ -1,0 +1,131 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+.auth-section {
+    @apply bg-white rounded-lg w-1/4 mx-auto mt-4 shadow-lg p-12;
+}
+
+.auth-title {
+	@apply text-2xl text-center font-bold py-10
+}
+
+.header-main {
+	@apply bg-[#333333] p-4 border-b border-[#4A90E2]
+}
+
+.nav-main {
+	@apply text-white container mx-auto flex justify-between items-center
+}
+
+.home {
+	@apply text-xl font-bold
+}
+
+.nav-item {
+    @apply text-white hover:text-green-500 transition-colors duration-200;
+}
+
+.note-item {
+	@apply flex flex-col justify-center mt-4 border w-full hover:shadow-lg transition-shadow duration-200 rounded-lg;
+}
+
+.home-section {
+	@apply flex-grow bg-[#F7F7F7]; 
+	animation-name: home;
+	animation-duration: 2s;
+}
+
+.footer {
+	@apply bg-gray-100 text-center
+}
+
+.footer-link {
+	@apply text-gray-600 hover:underline hover:text-gray-900 transition-colors
+}
+
+.notes-section {
+	@apply bg-white rounded-lg my-4 w-1/3 mx-auto shadow-lg p-12
+}
+
+.pricing-section {
+    @apply bg-white rounded-lg w-1/4 p-6 mt-4 shadow-lg;
+}
+
+.submit-btn {
+	@apply bg-green-500 text-white px-6 py-2 rounded-full hover:bg-green-600 transition-colors cursor-pointer
+}
+
+.reset-btn {
+    @apply bg-white border border-green-500 px-6 py-2 rounded hover:bg-green-600 hover:text-white transition-colors cursor-pointer text-right
+}
+
+.input-field {
+	@apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500
+}
+
+/* @keyframes home {
+	0% {
+		bottom: -50px;
+		opacity: 0;
+	}
+	50% {
+		bottom: 50%;
+		opacity: 1;
+	}
+	100% {
+	bottom: 100%;
+		opacity: 1;
+	}
+} */
+
+@keyframes loading {
+	from {
+        opacity: 0;
+	}
+
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes appear {
+    from {
+        transform: translateY(50px);
+    }
+
+    to {
+        transform: translateY(0);
+    }
+}
+
+
+.ql-toolbar.ql-snow {
+	background-color: #111827; 
+	border: none;
+}
+
+.ql-toolbar.ql-snow .ql-picker,
+.ql-toolbar.ql-snow .ql-stroke {
+	color: white;
+	stroke: white;
+}
+
+.ql-toolbar.ql-snow .ql-fill {
+	fill: white;
+}
+
+.ql-toolbar.ql-snow .ql-picker-options {
+	background-color: #1f2937; 
+	color: white;
+}
+
+.ql-toolbar.ql-snow .ql-picker-label {
+	color: white;
+}
+
+.ql-toolbar.ql-snow button:hover,
+.ql-toolbar.ql-snow button.ql-active {
+	background-color: #374151; 
+}

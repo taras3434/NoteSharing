@@ -1,0 +1,14 @@
+[
+    {
+      "question": "How can I edit the note?",
+      "answer": "Click the 'Edit Note' button to start editing."
+    },
+    {
+      "question": "How is my data saved?",
+      "answer": "Your note is saved when you click the 'Save Note' button."
+    },
+    {
+      "question": "Can I see older versions?",
+      "answer": "Yes, click the 'History' button to view previous versions."
+    }
+  ]

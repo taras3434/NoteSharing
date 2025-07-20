@@ -1,9 +1,84 @@
 {% extends "base.html" %}
+
 {% block content %}
-    <h1 class="text-2xl text-center font-bold py-10 ">My notes</h1>
-    {%for note in user_notes %}
-    <a href="note/{{note.id}}" class="flex shadow-lg bg-blue-500 rounded-lg p-4 my-4 w-1/2 mx-auto">
-        <span class="text-white">{{note.id}}</span>
-    </a>
-    {%endfor%}
+    {% if notes_count > 0 %}
+        <form id="search_form" method="get">
+            <div class="p-4 flex w-full md:w-1/3 mx-auto mt-14 space-x-2 align-middle">
+                <input 
+                    id="search-field"
+                    type="text" 
+                    name="search_field" 
+                    class="input-field" 
+                    placeholder="Search notes..." 
+                    value="{{ request.args.get('search_field', '') }}"
+                >
+                <button type="submit" class="submit-btn">
+                    Search
+                </button>
+                <div class ="flex items-center">
+                    <a href="{{url_for('notes.my_notes')}}" class="text-black">Clear</a>
+                </div>
+            </div>
+
+        </form>
+        <section class="notes-section">
+            {% if notes.count() > 0 %}
+                <h1 class="text-2xl text-center font-bold py-4 ">My notes</h1>
+                <form method="get">
+                    <input type="hidden" name="search_field" value="{{ request.args.get('search_field', '') }}">
+                    <select name="filter_dropdown" class="mb-10 p-2 rounded-lg float-right" onchange="this.form.submit()">
+                        <option value="val1" {% if request.args.get('filter_dropdown') == 'val1' %}selected{% endif %}>Newest</option>
+                        <option value="val2" {% if request.args.get('filter_dropdown') == 'val2' %}selected{% endif %}>Oldest</option>
+                        {% if not search_isActive %}
+                            <option value="val3" {% if request.args.get('filter_dropdown') == 'val3' %}selected{% endif %}>Title A-Z</option>
+                            <option value="val4" {% if request.args.get('filter_dropdown') == 'val4' %}selected{% endif %}>Title Z-A</option>
+                        {% endif %}
+                        <option value="val5" {% if request.args.get('filter_dropdown') == 'val5' %}selected{% endif %}>Favorite</option>
+                    </select>
+                </form>
+            {% elif search_isActive and notes.count() == 0 %}
+                <h2 class="flex justify-center mt-4 text-xl font-semibold text-gray-600">No results found for your search.</h2>
+            {% endif %}
+            {% for note in notes.all() %}
+            <div class="note-item">
+                <a href="{{url_for('notes.note', note_id=note.id)}}" class="flex space-x-4 p-4">
+                    <div class="w-1/2">
+                        <p class="font-semibold text-xl">{{note.title}}</p>
+                        <p>File created: {{note.start_date.strftime("%Y-%m-%d %H:%M")}}</p>
+                        <p>Last edit: {{note.last_edit.strftime("%Y-%m-%d %H:%M")}}</p>
+                    </div>
+                    <input id="is-favorite-checkbox-{{note.title}}" type="checkbox" data-id="{{ note.id }}" {% if note.is_favorite %}checked{% endif %} onchange="updateTaskStatus(this)">
+                    <label class="cursor-pointer" for="is-favorite-checkbox-{{note.title}}">Mark as favorite</label>
+                    <form class="w-1/4 my-auto" method="post" action="/note/{{ note.id }}/delete_note" onsubmit="return confirm('Are you sure you want to delete this note?');">
+                        <button class="text-red-600 float-right hover:underline text-sm my-auto">Delete</button>
+                    </form>
+                </a>     
+            </div>
+            {%endfor%}
+        {% else %}      
+            <div class="flex flex-col items-center justify-center">
+                <h1 class="text-2xl text-center font-bold py-10 ">You have no notes</h1>
+                <a href="{{ url_for('notes.create_note') }}" class="submit-btn">Create note</a></div>
+            </div>
+        {% endif %}
+        </section>
+        <script>
+            function updateFavoriteStatus(checkbox) {
+                const noteId = checkbox.dataset.id;
+                const isDone = checkbox.checked;
+    
+                fetch('/set-favorite', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        id: noteId,
+                        is_done: isDone
+                    })
+                })
+                .then(res => res.json())
+            }
+        </script>
+
 {% endblock %}

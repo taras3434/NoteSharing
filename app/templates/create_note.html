@@ -1,32 +1,47 @@
 {% extends "base.html" %}
 
-{% block head %}
-    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
-{% endblock %}
-
 {% block content %}
-    <div>
-        <form method="post" id="note-form">
-            {{form.hidden_tag()}}
-            {{form.note(id="flask-form-note", style="display: none;")}}
-            <div class="max-w-4xl mx-auto my-14">
-                <div id="editor" style="height: 600px;"/>
-            </div>
-            {{form.submit(class="bg-blue-500 text-white px-6 py-3 rounded hover:bg-blue-600 transition-colors")}}
-        </form>
-    </div>
+    <!-- Note creation form container with animation -->
+    <section class="w-1/3 mx-auto my-4 p-4 rounded-lg shadow-lg bg-white" style="animation-name: appear; animation-duration: 1s;">
+        <h1 class="text-4xl text-center font-black py-10">Create Your Note</h1>
 
-    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+        <form method="post" id="note-form">
+            <!-- CSRF token and hidden fields -->
+            {{ form.hidden_tag() }}
+
+            <!-- Title input -->
+            <div class="w-3/4 mx-auto">
+                {{ form.title(class="input-field", placeholder=form.title.label.text) }}
+            </div>
+
+            <!-- Hidden textarea to hold Quill HTML content -->
+            {{ form.note(id="flask-form-note", style="display: none;") }}
+
+            <!-- Quill rich text editor -->
+            <div class="w-3/4 mx-auto my-7">
+                <div id="note-creator" style="height: 300px;"></div>
+            </div>
+
+            <!-- Submit button aligned to the right -->
+            <div class="flex items-center justify-end mt-6">
+                {{ form.submit(class="submit-btn") }}
+            </div>
+        </form>
+    </section>
+    
+    <!-- Quill editor JS -->
+    <script src="{{ url_for('static', filename='quill/quill.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/index.js') }}"></script>
 
     <script>
-        const quill = new Quill('#editor', {
-            theme: 'snow'
-        });
-            
+        const text_editor = new TextEditor("#note-creator")            
+        // Reference to form and hidden textarea
         const form = document.getElementById('note-form');
         const hiddenField = document.getElementById('flask-form-note');
+
+        // On form submit, copy Quill editor HTML to hidden textarea
         form.addEventListener('submit', function (e) {
-            hiddenField.value = quill.root.innerHTML;
+            hiddenField.value = text_editor.root.innerHTML;
         });
     </script>
 {% endblock %}
