@@ -1,37 +1,94 @@
 {% extends "base.html" %}
 
 {% block content %}
-<nav class="flex items-center border-b border-gray-200 px-6 py-4 bg-white shadow-sm">
-    <div class="w-full max-w-4xl mx-auto flex items-center justify-between flex-wrap gap-4">
-        <div class="flex-grow truncate">
-            {% if note.user_id == current_user.id %}
-                <h1 id="title" class="text-2xl font-bold text-gray-900 truncate cursor-pointer" onclick="edit_title()">
-                    {{ note.title }}
-                </h1>
-                <form id="title-form" method="post" class="flex items-center gap-3">
-                    {{ form.hidden_tag() }}
-                    {{ form.title(id="flask-form-title", 
-                                  class="input-field", 
-                                  style="display: none;", 
-                                  value=note.title, 
-                                  onblur="this.form.submit()") }}
-                    <button id="js-save-title-btn" type="submit"
-                            class="submit-btn"
-                            style="display: none;">
-                        Save
-                    </button>
-                </form>
-            {% else %}
-                <h1 class="text-2xl font-bold text-gray-900 truncate">{{ note.title }}</h1>
-            {% endif %}
-        </div>
-    </div>
-</nav>
+<nav class="flex items-center justify-between border-b border-gray-200 px-6 py-4 bg-white shadow-sm max-w-6xl mx-auto">
+    <!-- Left empty space div removed, not needed -->
 
-<section class="max-w-2xl mx-auto bg-white rounded-xl shadow p-8 my-14">
-    <div id="note-editor" class="prose max-w-none text-lg text-gray-800 leading-relaxed min-h-[300px]">{{ note.text | safe }}</div>
+    <a class="submit-btn" href="{{ url_for('notes.create_note') }}">Create New Note</a>
+
+    <div class="flex flex-col items-center w-1/2">
+        {% if note.user_id == current_user.id %}
+            <h1 id="title"
+                class="text-2xl font-bold text-gray-900 truncate cursor-pointer text-center"
+                onclick="edit_title()">
+                {{ note.title }}
+            </h1>
+            <form id="title-form" method="post" class="flex gap-3 justify-center items-center w-full">
+                {{ form.hidden_tag() }}
+                {{ form.title(id="flask-form-title",
+                            class="input-field w-full",
+                            style="display: none;",
+                            value=note.title,
+                            onblur="this.form.submit()") }}
+                <button id="js-save-title-btn" type="submit"
+                        class="submit-btn"
+                        style="display: none;">
+                    Save
+                </button>
+            </form>
+        {% else %}
+            <h1 class="text-2xl font-bold text-gray-900 truncate">{{ note.title }}</h1>
+        {% endif %}
+    </div>
 
     {% if note.user_id == current_user.id %}
+    <div x-data="{ showVersionSection: false }" class="relative">
+        <button type="button"
+                @click="showVersionSection = !showVersionSection"
+                class="btn-primary submit-btn">
+            History
+        </button>
+        <div
+            x-show="showVersionSection"
+            x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0 scale-95"
+            x-transition:enter-end="opacity-100 scale-100"
+            x-transition:leave="transition ease-in duration-150"
+            x-transition:leave-start="opacity-100 scale-100"
+            x-transition:leave-end="opacity-0 scale-95"
+            class="absolute left-1/2 transform -translate-x-1/2 mt-2 w-60 origin-top rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
+            >
+            <ul class="divide-y divide-gray-200 max-h-64 overflow-y-auto p-2 text-left">
+                {% for version in note_versions %}
+                <li class="py-2 px-3 hover:bg-gray-100 rounded">
+                    <a href="{{ url_for('notes.note', note_id=note.id, version_id=version.id) }}"
+                    class="block text-blue-600 hover:underline">
+                        {{ version.version_date.strftime("%Y-%m-%d %H:%M") }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+</nav>
+
+<section class="max-w-6xl mx-auto flex items-start gap-6 mt-10 px-4 py-auto">
+    <!-- Sidebar -->
+    <aside class="flex-1 max-w-xs max-h-96 overflow-y-auto">
+        <h1 class="text-2xl text-center font-bold">My Notes</h1>
+        {% for note in notes.all() %}
+        <div class="flex items-center space-x-4 mb-4 max-h-17 overflow-auto hover:bg-slate-300 transition-colors p-4 rounded-lg">
+            <div class="flex-1 min-w-0">
+                <a href="{{url_for('notes.note', note_id=note.id)}}" class="block truncate">
+                    <p class="font-semibold text-lg">{{note.title}}</p>
+                    <p class="text-sm text-gray-500">Created: {{note.start_date.strftime("%Y-%m-%d %H:%M")}}</p>
+                </a>
+            </div>
+            <form method="post" action="/note/{{ note.id }}/delete_note" onsubmit="return confirm('Are you sure you want to delete this note?');">
+                <button class="text-red-600 hover:underline text-sm">Delete</button>
+            </form>
+        </div>
+        {% endfor %}
+    </aside>
+
+    <!-- Main Note Area -->
+    <article class="flex-[2] bg-white rounded-xl shadow p-8 min-w-0">
+        <div id="note-editor" class="prose max-w-none text-lg text-gray-800 leading-relaxed min-h-[300px]">
+            {{ note.text | safe }}
+        </div>
+
+        {% if note.user_id == current_user.id %}
         <div class="flex justify-end mt-8 gap-4">
             <button id="js-edit-note-btn" class="btn-primary submit-btn" onclick="edit_note()">Edit Note</button>
             <form id="note-form" method="post" class="hidden">
@@ -40,33 +97,8 @@
                 <button id="js-save-note-btn" type="submit" class="submit-btn">Save Note</button>
             </form>
         </div>
-        <aside x-data="{ showVersionSection: false }" class="fixed top-20 right-10 bg-white p-4 rounded-lg shadow-lg w-60 text-center z-50">
-            <button type="button" @click="showVersionSection = !showVersionSection" class="btn-primary w-full mb-3 submit-btn">
-                History
-            </button>
-            <div
-                x-show="showVersionSection"
-                x-transition:enter="transition transform ease-out duration-300"
-                x-transition:enter-start="opacity-0 scale-y-0"
-                x-transition:enter-end="opacity-100 scale-y-100"
-                x-transition:leave="transition transform ease-in duration-200"
-                x-transition:leave-start="opacity-100 scale-y-100"
-                x-transition:leave-end="opacity-0 scale-y-0"
-                class="fixed overflow-y-auto max-h-64 transform origin-top bg-white rounded shadow-lg p-4 w-60 text-center z-50 right-10"
-                style="display: none;"
-            >
-                <ul class="divide-y divide-gray-200">
-                    {% for version in note_versions %}
-                    <li class="py-2 hover:bg-gray-100 rounded">
-                        <a href="{{ url_for('notes.note', note_id=note.id, version_id=version.id) }}" class="block text-blue-600 hover:underline">
-                            {{ version.version_date.strftime("%Y-%m-%d %H:%M") }}
-                        </a>
-                    </li>
-                    {% endfor %}
-                </ul>
-            </div>
-        </aside>
-    {% endif %}
+        {% endif %}
+    </article>
 </section>
 
 <!-- Quill editor JS -->
@@ -74,36 +106,16 @@
 <script src="{{ url_for('static', filename='js/index.js') }}"></script>
 
 <script>
-    const text_editor = new TextEditor("#note-editor")            
-    text_editor.toolbar(false)
-    text_editor.update()
-
-    function edit_note() {
-        text_editor.setTheme("snow")
-        text_editor.update(false)
-
-        document.getElementById('js-edit-note-btn').style.display = 'none';
-        document.getElementById('note-form').classList.remove('hidden');
-    }
-
-    function edit_title() {
-        const editTitleInput = document.getElementById("flask-form-title");
-        const titleBtn = document.getElementById("title");
-        const saveTitleBtn = document.getElementById('js-save-title-btn');
-
-        editTitleInput.style.display = "block";
-        editTitleInput.focus();
-
-        titleBtn.style.display = "none";
-        saveTitleBtn.style.display = "inline-block";
-    }
+    let quill = new Quill('#note-editor', {
+        theme: 'bubble',
+        readOnly: true,
+        modules: { toolbar: false }
+    });
 
     const noteForm = document.getElementById('note-form');
-    if (noteForm) {
-        noteForm.addEventListener('submit', function (e) {
-            const hiddenField = document.getElementById('flask-form-note');
-            hiddenField.value = text_editor.root.innerHTML;
-        });
-    }
+    noteForm.addEventListener('submit', function (e) {
+        const hiddenField = document.getElementById('flask-form-note');
+        hiddenField.value = quill.root.innerHTML;
+    });
 </script>
 {% endblock %}

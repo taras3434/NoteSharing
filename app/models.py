@@ -24,13 +24,23 @@ class User(db.Model, UserMixin):
         """
         
         #plan restrictions
-        plan = {"free" : {"max_notes" : 10, "max_text_length" : 128}}
+        plan = {
+                "free": {"max_notes": 10, "max_text_length": 128},
+                "pro": {"max_notes": None, "max_text_length": None}
+                }
         
         # Clean the text to count real content length
         text_length = len(clean_html(text))
 
+
+        max_notes = plan[self.plan]["max_notes"]
+        max_length = plan[self.plan]["max_text_length"]
+
+        over_note_limit = max_notes is not None and note_count >= max_notes
+        over_length_limit = max_length is not None and text_length >= max_length
+        
         # Return True if user exceeded restrictions
-        return (note_count >= plan[self.plan]["max_notes"]) or (text_length >= plan[self.plan]["max_text_length"])
+        return over_note_limit or over_length_limit
 
 class Note(db.Model):
     """

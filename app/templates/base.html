@@ -52,8 +52,10 @@
             <div class="flex gap-6 items-center justify-center mb-4">
                 <!-- Footer navigation links -->
                 <a href="{{url_for('home.terms_of_use')}}" class="footer-link">Terms Of Use</a>
+                <span class="footer-link">|</span>
                 <a href="{{url_for('home.privacy_policy')}}" class="footer-link">Privacy Policy</a>
             </div>
         </footer>
+        <script src="{{ url_for('static', filename='js/index.js') }}"></script>
     </body>
 </html>

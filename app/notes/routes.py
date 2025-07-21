@@ -106,6 +106,7 @@ def note(note_id):
     form = EditNote()
     note = Note.query.get(note_id)
     note_versions = NoteVersion.query.filter_by(note_id=note_id)
+    notes = Note.query.filter_by(user_id=current_user.id).order_by(Note.start_date.desc())
 
     if note is None:
         abort(404)
@@ -147,7 +148,8 @@ def note(note_id):
                            note=note,
                            note_versions=note_versions,
                            current_user=current_user, 
-                           form=form)
+                           form=form,
+                           notes=notes)
 
 @notes_bp.route("/note/<note_id>/delete_note", methods=["POST"])
 @login_required
