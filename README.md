@@ -1,6 +1,7 @@
 <h1>Installation</h1>
-<h2>Requirement</h2>
+<h2>Requirements</h2>
 Python 3.10
+npm 10.9.2
 <h2>Navigate To Project Directory</h2>
 <p>cd NoteSharing</p>
 <h2>Install Python Dependencies</h2>
