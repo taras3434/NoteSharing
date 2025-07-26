@@ -16,16 +16,9 @@ def create_note():
     """
     form = CreateNote()
 
-    if form.validate_on_submit():    
-        # Query to get all notes from db for plan check
-        user_notes = Note.query.filter_by(user_id=current_user.id)
-
+    if form.validate_on_submit():
         note_title = form.title.data
         note_text = form.note.data
-        
-        # Check if the user's plan allows adding this note
-        if current_user.check_plan(note_text, user_notes.count()):
-            return redirect(url_for("home.pricing"))
         
         # Create new note with a unique UUID
         note_id = str(uuid.uuid4())
@@ -132,10 +125,6 @@ def note(note_id):
 
             note.text = form.note.data
             note.last_edit = datetime.now(timezone.utc)
-            
-            # Check user plan for updated note
-            if current_user.check_plan(form.note.data):
-                return redirect(url_for("home.pricing"))
         
         # Handle note title update   
         elif form.title.data:

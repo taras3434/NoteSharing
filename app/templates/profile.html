@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
+    <!-- Profile section -->
     <section class="bg-white rounded-lg w-1/4 shadow-xl mx-auto my-14">
         <h1 class="text-4xl text-center p-4 font-black">Profile</h1>
         <div class="p-4 space-y-3">
@@ -8,12 +9,8 @@
                 <p>{{current_user.username}}</p>
             </div>
             <div class="p-4 text-xl border-b">
-                <span class="font-semibold">Plan</span>
-                <p>{{current_user.plan}}</p>
-            </div>
-            <div class="p-4 text-xl border-b">
                 <span class="font-semibold">Notes</span>
-                <p>{{user_notes.count()}} {% if current_user.plan == 'free' %}/ 10 {% endif %}</p>
+                <p>{{user_notes.count()}}</p>
             </div>
             <a class="flex submit-btn justify-center" href="{{url_for('auth.change_password')}}">Change password</a>
         </div>

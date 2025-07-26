@@ -2,15 +2,13 @@
 
 {% block content %}
 <nav class="flex items-center justify-between border-b border-gray-200 px-6 py-4 bg-white shadow-sm max-w-6xl mx-auto">
-    <!-- Left empty space div removed, not needed -->
-
     <a class="submit-btn" href="{{ url_for('notes.create_note') }}">Create New Note</a>
 
-    <div class="flex flex-col items-center w-1/2">
+    <div class="flex flex-col items-center w-1/2" x-data>
         {% if note.user_id == current_user.id %}
-            <h1 id="title"
+            <h1 id="js-edit-title-btn" @click="editTitle($refs.editTitleInput, $event.target, $refs.saveTitleBtn)"
                 class="text-2xl font-bold text-gray-900 truncate cursor-pointer text-center"
-                onclick="edit_title()">
+            >
                 {{ note.title }}
             </h1>
             <form id="title-form" method="post" class="flex gap-3 justify-center items-center w-full">
@@ -22,7 +20,9 @@
                             onblur="this.form.submit()") }}
                 <button id="js-save-title-btn" type="submit"
                         class="submit-btn"
-                        style="display: none;">
+                        style="display: none;"
+                        x-ref="saveTitleBtn"
+                        >
                     Save
                 </button>
             </form>
@@ -89,9 +89,9 @@
         </div>
 
         {% if note.user_id == current_user.id %}
-        <div class="flex justify-end mt-8 gap-4">
-            <button id="js-edit-note-btn" class="btn-primary submit-btn" onclick="edit_note()">Edit Note</button>
-            <form id="note-form" method="post" class="hidden">
+        <div class="flex justify-end mt-8 gap-4" x-data>
+            <button id="js-edit-note-btn" class="btn-primary submit-btn" @click="editeNote($event.target, $refs.noteForm)">Edit Note</button>
+            <form x-ref="noteForm" id="note-form" method="post" class="hidden">
                 {{ form.hidden_tag() }}
                 {{ form.note(id="flask-form-note", class="hidden") }}
                 <button id="js-save-note-btn" type="submit" class="submit-btn">Save Note</button>
@@ -103,19 +103,6 @@
 
 <!-- Quill editor JS -->
 <script src="{{ url_for('static', filename='quill/quill.js') }}"></script>
-<script src="{{ url_for('static', filename='js/index.js') }}"></script>
+<script src="{{ url_for('static', filename='js/note.js') }}"></script>
 
-<script>
-    let quill = new Quill('#note-editor', {
-        theme: 'bubble',
-        readOnly: true,
-        modules: { toolbar: false }
-    });
-
-    const noteForm = document.getElementById('note-form');
-    noteForm.addEventListener('submit', function (e) {
-        const hiddenField = document.getElementById('flask-form-note');
-        hiddenField.value = quill.root.innerHTML;
-    });
-</script>
 {% endblock %}

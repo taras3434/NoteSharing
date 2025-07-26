@@ -31,30 +31,5 @@
     
     <!-- Quill editor JS -->
     <script src="{{ url_for('static', filename='quill/quill.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/index.js') }}"></script>
-
-    <script>
-        // Initialize Quill editor with snow theme
-        const quill = new Quill('#note-creator', {
-        theme: 'snow',
-        readOnly: false,
-        modules: {
-            toolbar: [
-                [{ header: [1, 2, false] }],
-                ['bold', 'italic', 'underline', 'strike'],
-                ['link', 'blockquote', 'code-block', 'image'],
-                [{ list: 'ordered' }, { list: 'bullet' }],
-                ['clean']
-            ]
-        }});
-            
-        // Reference to form and hidden textarea
-        const form = document.getElementById('note-form');
-        const hiddenField = document.getElementById('flask-form-note');
-
-        // On form submit, copy Quill editor HTML to hidden textarea
-        form.addEventListener('submit', function (e) {
-            hiddenField.value = quill.root.innerHTML;
-        });
-    </script>
+    <script src="{{ url_for('static', filename='js/create_note.js') }}"></script>
 {% endblock %}

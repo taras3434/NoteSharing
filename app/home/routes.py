@@ -20,13 +20,6 @@ def home():
 
     return render_template("home.html", faqs=faqs)
 
-@home_bp.route("/pricing")
-def pricing():
-    """
-    Pricing information render
-    """
-    return render_template("pricing.html")
-
 @home_bp.route("/terms-of-use")
 def terms_of_use():
     """

@@ -11,7 +11,7 @@
         <!-- Load Alpine.js locally -->
         <script defer src="{{ url_for('static', filename='alpine/alpine.min.js') }}"></script>
     </head>
-    <body class="flex flex-col min-h-screen">
+    <body class="flex flex-col min-h-screen ">
         <!-- Main header section -->
         <header class="header-main">
              <nav class="nav-main">
@@ -22,7 +22,6 @@
                         <!-- Navigation links -->
                         <a class="nav-item" href="{{url_for('notes.create_note')}}">Create Note</a>
                         <a class="nav-item" href="{{url_for('notes.my_notes')}}">View Notes</a>  
-                        <a class="nav-item" href="{{url_for('home.pricing')}}">Pricing</a>  
                         <a class="nav-item" href="{{url_for('auth.profile')}}">Profile</a>
                         <span>|</span> 
                         <!-- Conditional login/logout links based on user authentication status -->
@@ -56,6 +55,5 @@
                 <a href="{{url_for('home.privacy_policy')}}" class="footer-link">Privacy Policy</a>
             </div>
         </footer>
-        <script src="{{ url_for('static', filename='js/index.js') }}"></script>
     </body>
 </html>
