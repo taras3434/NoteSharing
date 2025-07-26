@@ -2,7 +2,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from flask_migrate import Migrate
 from datetime import datetime, timezone
-from .utils import clean_html
 
 # Initialize database and migration objects
 db = SQLAlchemy()
@@ -15,22 +14,7 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False) # Unique username
     password_hash = db.Column(db.String(128), nullable=False) # Hashed password
-    plan = db.Column(db.String(20), default='free') # User subscription plan
     is_admin = db.Column(db.Boolean, default=False)
-    
-    def check_plan(self, text, note_count=False):
-        """
-        Check if user exceeds plan limits
-        """
-        
-        #plan restrictions
-        plan = {"free" : {"max_notes" : 10, "max_text_length" : 128}}
-        
-        # Clean the text to count real content length
-        text_length = len(clean_html(text))
-
-        # Return True if user exceeded restrictions
-        return (note_count >= plan[self.plan]["max_notes"]) or (text_length >= plan[self.plan]["max_text_length"])
 
 class Note(db.Model):
     """
