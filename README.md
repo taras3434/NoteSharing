@@ -1,4 +1,6 @@
 <h1>Installation</h1>
+<h2>Requirement</h2>
+Python 3.10
 <h2>Install Python Dependencies</h2>
 <p>pip install -r requirements.txt</p>
 <h2>Navigate To Project Directory</h2>
