@@ -7,6 +7,5 @@ Python 3.10
 <p>cd NoteSharing</p>
 <h2>Install Node.js Dependencies</h2>
 <p>npm install</p>
-<p>npm run build:all</p>
 <h2>Run Application</h2>
 <p>python run.py</p>
